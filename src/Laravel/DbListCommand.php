@@ -3,8 +3,8 @@
 use Symfony\Component\Console\Input\InputOption;
 use BackupManager\Filesystems\FilesystemProvider;
 
-class DbListCommand extends BaseCommand
-{
+class DbListCommand extends BaseCommand {
+
     /**
      * The console command name.
      *
@@ -39,8 +39,7 @@ class DbListCommand extends BaseCommand
     private $missingArguments;
 
 
-    public function __construct(FilesystemProvider $filesystems)
-    {
+    public function __construct(FilesystemProvider $filesystems) {
         parent::__construct();
         $this->filesystems = $filesystems;
     }
@@ -54,8 +53,7 @@ class DbListCommand extends BaseCommand
      * @throws \BackupManager\Config\ConfigNotFoundForConnection
      * @return void
      */
-    public function fire()
-    {
+    public function fire() {
         if ($this->isMissingArguments()) {
             $this->displayMissingArguments();
             $this->promptForMissingArgumentValues();
@@ -80,8 +78,7 @@ class DbListCommand extends BaseCommand
     /**
      * @return bool
      */
-    private function isMissingArguments()
-    {
+    private function isMissingArguments() {
         foreach ($this->required as $argument) {
             if ( ! $this->option($argument)) {
                 $this->missingArguments[] = $argument;
@@ -93,8 +90,7 @@ class DbListCommand extends BaseCommand
     /**
      * @return void
      */
-    private function displayMissingArguments()
-    {
+    private function displayMissingArguments() {
         $formatted = implode(', ', $this->missingArguments);
         $this->info("These arguments haven't been filled yet: <comment>{$formatted}</comment>.");
         $this->info('The following questions will fill these in for you.');
@@ -104,8 +100,7 @@ class DbListCommand extends BaseCommand
     /**
      * @return void
      */
-    private function promptForMissingArgumentValues()
-    {
+    private function promptForMissingArgumentValues() {
         foreach ($this->missingArguments as $argument) {
             if ($argument == 'source') {
                 $this->askSource();
@@ -116,8 +111,7 @@ class DbListCommand extends BaseCommand
         }
     }
 
-    private function askSource()
-    {
+    private function askSource() {
         $providers = $this->filesystems->getAvailableProviders();
         $formatted = implode(', ', $providers);
         $this->info("Available sources: <comment>{$formatted}</comment>");
@@ -125,8 +119,7 @@ class DbListCommand extends BaseCommand
         $this->input->setOption('source', $source);
     }
 
-    private function askPath()
-    {
+    private function askPath() {
         $root = $this->filesystems->getConfig($this->option('source'), 'root');
         $path = $this->ask("From which path?<comment> {$root}</comment>");
         $this->input->setOption('path', $path);
@@ -135,12 +128,11 @@ class DbListCommand extends BaseCommand
     /**
      * @return void
      */
-    private function validateArguments()
-    {
+    private function validateArguments() {
         $root = $this->filesystems->getConfig($this->option('source'), 'root');
         $this->info('Just to be sure...');
         $this->info(sprintf('Do you want to list files from <comment>%s</comment> on <comment>%s</comment>?',
-            $root.$this->option('path'),
+            $root . $this->option('path'),
             $this->option('source')
         ));
         $this->line('');
@@ -155,8 +147,7 @@ class DbListCommand extends BaseCommand
      *
      * @return void
      */
-    private function reaskArguments()
-    {
+    private function reaskArguments() {
         $this->line('');
         $this->info('Answers have been reset and re-asking questions.');
         $this->line('');
@@ -168,16 +159,14 @@ class DbListCommand extends BaseCommand
      *
      * @return array
      */
-    protected function getOptions()
-    {
+    protected function getOptions() {
         return [
             ['source', null, InputOption::VALUE_OPTIONAL, 'Source configuration name', null],
             ['path', null, InputOption::VALUE_OPTIONAL, 'Directory path', null],
         ];
     }
 
-    private function formatBytes($bytes, $precision = 2)
-    {
+    private function formatBytes($bytes, $precision = 2) {
         $units = ['B', 'KB', 'MB', 'GB', 'TB'];
         $bytes = max($bytes, 0);
         $pow = floor(($bytes ? log($bytes) : 0) / log(1024));

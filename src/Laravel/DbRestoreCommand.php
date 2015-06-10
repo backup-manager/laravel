@@ -5,8 +5,8 @@ use BackupManager\Databases\DatabaseProvider;
 use BackupManager\Procedures\RestoreProcedure;
 use BackupManager\Filesystems\FilesystemProvider;
 
-class DbRestoreCommand extends BaseCommand
-{
+class DbRestoreCommand extends BaseCommand {
+
     /**
      * The console command name.
      *
@@ -55,8 +55,7 @@ class DbRestoreCommand extends BaseCommand
      * @param \BackupManager\Filesystems\FilesystemProvider $filesystems
      * @param \BackupManager\Databases\DatabaseProvider $databases
      */
-    public function __construct(RestoreProcedure $restore, FilesystemProvider $filesystems, DatabaseProvider $databases)
-    {
+    public function __construct(RestoreProcedure $restore, FilesystemProvider $filesystems, DatabaseProvider $databases) {
         parent::__construct();
         $this->restore = $restore;
         $this->filesystems = $filesystems;
@@ -66,8 +65,7 @@ class DbRestoreCommand extends BaseCommand
     /**
      *
      */
-    public function fire()
-    {
+    public function fire() {
         if ($this->isMissingArguments()) {
             $this->displayMissingArguments();
             $this->promptForMissingArgumentValues();
@@ -85,7 +83,7 @@ class DbRestoreCommand extends BaseCommand
         $this->line('');
         $root = $this->filesystems->getConfig($this->option('source'), 'root');
         $this->info(sprintf('Successfully restored <comment>%s</comment> from <comment>%s</comment> to database <comment>%s</comment>.',
-            $root.$this->option('sourcePath'),
+            $root . $this->option('sourcePath'),
             $this->option('source'),
             $this->option('database')
         ));
@@ -94,8 +92,7 @@ class DbRestoreCommand extends BaseCommand
     /**
      * @return bool
      */
-    private function isMissingArguments()
-    {
+    private function isMissingArguments() {
         foreach ($this->required as $argument) {
             if ( ! $this->option($argument)) {
                 $this->missingArguments[] = $argument;
@@ -107,8 +104,7 @@ class DbRestoreCommand extends BaseCommand
     /**
      * @return void
      */
-    private function displayMissingArguments()
-    {
+    private function displayMissingArguments() {
         $formatted = implode(', ', $this->missingArguments);
         $this->info("These arguments haven't been filled yet: <comment>{$formatted}</comment>");
         $this->info('The following questions will fill these in for you.');
@@ -118,8 +114,7 @@ class DbRestoreCommand extends BaseCommand
     /**
      * @return void
      */
-    private function promptForMissingArgumentValues()
-    {
+    private function promptForMissingArgumentValues() {
         foreach ($this->missingArguments as $argument) {
             if ($argument == 'source') {
                 $this->askSource();
@@ -134,8 +129,7 @@ class DbRestoreCommand extends BaseCommand
         }
     }
 
-    private function askSource()
-    {
+    private function askSource() {
         $providers = $this->filesystems->getAvailableProviders();
         $formatted = implode(', ', $providers);
         $this->info("Available storage services: <comment>{$formatted}</comment>");
@@ -143,8 +137,7 @@ class DbRestoreCommand extends BaseCommand
         $this->input->setOption('source', $source);
     }
 
-    private function askSourcePath()
-    {
+    private function askSourcePath() {
         // ask path
         $root = $this->filesystems->getConfig($this->option('source'), 'root');
         $path = $this->ask("From which path do you want to select?<comment> {$root}</comment>");
@@ -182,8 +175,7 @@ class DbRestoreCommand extends BaseCommand
         $this->input->setOption('sourcePath', "{$path}/{$filename}");
     }
 
-    private function askDatabase()
-    {
+    private function askDatabase() {
         $providers = $this->databases->getAvailableProviders();
         $formatted = implode(', ', $providers);
         $this->info("Available database connections: <comment>{$formatted}</comment>");
@@ -191,8 +183,7 @@ class DbRestoreCommand extends BaseCommand
         $this->input->setOption('database', $database);
     }
 
-    private function askCompression()
-    {
+    private function askCompression() {
         $types = ['null', 'gzip'];
         $formatted = implode(', ', $types);
         $this->info("Available compression types: <comment>{$formatted}</comment>");
@@ -203,12 +194,11 @@ class DbRestoreCommand extends BaseCommand
     /**
      * @return void
      */
-    private function validateArguments()
-    {
+    private function validateArguments() {
         $root = $this->filesystems->getConfig($this->option('source'), 'root');
         $this->info('Just to be sure...');
         $this->info(sprintf('Do you want to restore the backup <comment>%s</comment> from <comment>%s</comment> to database <comment>%s</comment> and decompress it from <comment>%s</comment>?',
-            $root.$this->option('sourcePath'),
+            $root . $this->option('sourcePath'),
             $this->option('source'),
             $this->option('database'),
             $this->option('compression')
@@ -225,8 +215,7 @@ class DbRestoreCommand extends BaseCommand
      *
      * @return void
      */
-    private function reaskArguments()
-    {
+    private function reaskArguments() {
         $this->line('');
         $this->info('Answers have been reset and re-asking questions.');
         $this->line('');
@@ -238,8 +227,7 @@ class DbRestoreCommand extends BaseCommand
      *
      * @return array
      */
-    protected function getOptions()
-    {
+    protected function getOptions() {
         return [
             ['source', null, InputOption::VALUE_OPTIONAL, 'Source configuration name', null],
             ['sourcePath', null, InputOption::VALUE_OPTIONAL, 'Source path from service', null],
@@ -248,8 +236,7 @@ class DbRestoreCommand extends BaseCommand
         ];
     }
 
-    private function formatBytes($bytes, $precision = 2)
-    {
+    private function formatBytes($bytes, $precision = 2) {
         $units = ['B', 'KB', 'MB', 'GB', 'TB'];
         $bytes = max($bytes, 0);
         $pow = floor(($bytes ? log($bytes) : 0) / log(1024));

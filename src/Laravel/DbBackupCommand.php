@@ -9,8 +9,8 @@ use BackupManager\Filesystems\FilesystemProvider;
  * Class ManagerBackupCommand
  * @package BackupManager\Laravel4
  */
-class DbBackupCommand extends BaseCommand
-{
+class DbBackupCommand extends BaseCommand {
+
     /**
      * The console command name.
      *
@@ -59,8 +59,7 @@ class DbBackupCommand extends BaseCommand
      * @param DatabaseProvider $databases
      * @param FilesystemProvider $filesystems
      */
-    public function __construct(BackupProcedure $backupProcedure, DatabaseProvider $databases, FilesystemProvider $filesystems)
-    {
+    public function __construct(BackupProcedure $backupProcedure, DatabaseProvider $databases, FilesystemProvider $filesystems) {
         $this->backupProcedure = $backupProcedure;
         $this->databases = $databases;
         $this->filesystems = $filesystems;
@@ -77,8 +76,7 @@ class DbBackupCommand extends BaseCommand
      * @throws \BackupManager\Config\ConfigNotFoundForConnection
      * @return mixed
      */
-	public function fire()
-	{
+    public function fire() {
         if ($this->isMissingArguments()) {
             $this->displayMissingArguments();
             $this->promptForMissingArgumentValues();
@@ -99,15 +97,14 @@ class DbBackupCommand extends BaseCommand
             $this->option('database'),
             $this->option('compression'),
             $this->option('destination'),
-            $root.$this->option('destinationPath')
+            $root . $this->option('destinationPath')
         ));
-	}
+    }
 
     /**
      * @return bool
      */
-    private function isMissingArguments()
-    {
+    private function isMissingArguments() {
         foreach ($this->required as $argument) {
             if ( ! $this->option($argument)) {
                 $this->missingArguments[] = $argument;
@@ -119,8 +116,7 @@ class DbBackupCommand extends BaseCommand
     /**
      * @return void
      */
-    private function displayMissingArguments()
-    {
+    private function displayMissingArguments() {
         $formatted = implode(', ', $this->missingArguments);
         $this->info("These arguments haven't been filled yet: <comment>{$formatted}</comment>");
         $this->info('The following questions will fill these in for you.');
@@ -130,8 +126,7 @@ class DbBackupCommand extends BaseCommand
     /**
      * @return void
      */
-    private function promptForMissingArgumentValues()
-    {
+    private function promptForMissingArgumentValues() {
         foreach ($this->missingArguments as $argument) {
             if ($argument == 'database') {
                 $this->askDatabase();
@@ -146,8 +141,7 @@ class DbBackupCommand extends BaseCommand
         }
     }
 
-    private function askDatabase()
-    {
+    private function askDatabase() {
         $providers = $this->databases->getAvailableProviders();
         $formatted = implode(', ', $providers);
         $this->info("Available database connections: <comment>{$formatted}</comment>");
@@ -155,8 +149,7 @@ class DbBackupCommand extends BaseCommand
         $this->input->setOption('database', $database);
     }
 
-    private function askDestination()
-    {
+    private function askDestination() {
         $providers = $this->filesystems->getAvailableProviders();
         $formatted = implode(', ', $providers);
         $this->info("Available storage services: <comment>{$formatted}</comment>");
@@ -164,15 +157,13 @@ class DbBackupCommand extends BaseCommand
         $this->input->setOption('destination', $destination);
     }
 
-    private function askDestinationPath()
-    {
+    private function askDestinationPath() {
         $root = $this->filesystems->getConfig($this->option('destination'), 'root');
         $path = $this->ask("How do you want to name the backup?<comment> {$root}</comment>");
         $this->input->setOption('destinationPath', $path);
     }
 
-    private function askCompression()
-    {
+    private function askCompression() {
         $types = ['null', 'gzip'];
         $formatted = implode(', ', $types);
         $this->info("Available compression types: <comment>{$formatted}</comment>");
@@ -185,14 +176,13 @@ class DbBackupCommand extends BaseCommand
      * @throws \BackupManager\Config\ConfigNotFoundForConnection
      * @return void
      */
-    private function validateArguments()
-    {
+    private function validateArguments() {
         $root = $this->filesystems->getConfig($this->option('destination'), 'root');
         $this->info('Just to be sure...');
         $this->info(sprintf('Do you want to create a backup of <comment>%s</comment>, store it on <comment>%s</comment> at <comment>%s</comment> and compress it to <comment>%s</comment>?',
             $this->option('database'),
             $this->option('destination'),
-            $root.$this->option('destinationPath'),
+            $root . $this->option('destinationPath'),
             $this->option('compression')
         ));
         $this->line('');
@@ -207,8 +197,7 @@ class DbBackupCommand extends BaseCommand
      *
      * @return void
      */
-    private function reaskArguments()
-    {
+    private function reaskArguments() {
         $this->line('');
         $this->info('Answers have been reset and re-asking questions.');
         $this->line('');
@@ -220,13 +209,12 @@ class DbBackupCommand extends BaseCommand
      *
      * @return array
      */
-    protected function getOptions()
-    {
+    protected function getOptions() {
         return [
             ['database', null, InputOption::VALUE_OPTIONAL, 'Database configuration name', null],
             ['destination', null, InputOption::VALUE_OPTIONAL, 'Destination configuration name', null],
             ['destinationPath', null, InputOption::VALUE_OPTIONAL, 'File destination path', null],
             ['compression', null, InputOption::VALUE_OPTIONAL, 'Compression type', null],
-		];
-	}
+        ];
+    }
 }
