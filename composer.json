@@ -36,7 +36,7 @@
   },
   "autoload": {
     "psr-4": {
-      "BackupManager\\Laravel4": "src/"
+      "BackupManager\\Laravel4\\": "src/"
     }
   },
   "license": "MIT",
