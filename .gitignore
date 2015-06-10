@@ -1,0 +1,12 @@
+/vendor
+/working
+/.vagrant
+/.phpspec
+/bin
+/tests/report
+/ansible
+/.idea
+composer.phar
+composer.lock
+vagrant_ansible_inventory_default
+Vagrantfile

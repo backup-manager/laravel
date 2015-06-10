@@ -1,0 +1,43 @@
+{
+  "name": "backup-manager/laravel-4",
+  "description": "Laravel 4 Integration for the Backup Manager - dump to and restore databases from S3, Dropbox, FTP, and SFTP.",
+  "authors": [
+    {
+      "name": "Shawn McCool",
+      "email": "shawn@heybigname.com",
+      "homepage": "http://heybigname.com/"
+    },
+    {
+      "name": "Mitchell van Wijngaarden",
+      "email": "mitchell@kooding.nl",
+      "homepage": "http://heybigname.com/"
+    }
+  ],
+  "require": {
+    "php": ">=5.4.0",
+    "symfony/process": "2.*",
+    "illuminate/support": "4.x",
+    "illuminate/container": "4.x",
+    "illuminate/console": "4.x"
+  },
+  "require-dev": {
+    "mockery/mockery": "dev-master",
+    "satooshi/php-coveralls": "~0.6",
+    "backup-manager/backup-manager": "0.3.10"
+  },
+  "config": {
+    "bin-dir": "bin"
+  },
+  "autoload": {
+    "psr-4": {
+      "BackupManager\\Laravel4": "src/"
+    }
+  },
+  "license": "MIT",
+  "minimum-stability": "dev",
+  "extra": {
+    "branch-alias": {
+      "dev-master": "0.1"
+    }
+  }
+}
