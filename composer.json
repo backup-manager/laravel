@@ -29,7 +29,7 @@
   "require-dev": {
     "mockery/mockery": "dev-master",
     "satooshi/php-coveralls": "~0.6",
-    "heybigname/backup-manager": "dev-version1"
+    "heybigname/backup-manager": "version1-dev"
   },
   "config": {
     "bin-dir": "bin"
