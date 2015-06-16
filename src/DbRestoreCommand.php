@@ -179,7 +179,7 @@ class DbRestoreCommand extends BaseCommand {
         $providers = $this->databases->getAvailableProviders();
         $formatted = implode(', ', $providers);
         $this->info("Available database connections: <comment>{$formatted}</comment>");
-        $database = $this->autocomplete("From which database connection you want to dump?", $providers);
+        $database = $this->autocomplete("From which database connection you want to restore?", $providers);
         $this->input->setOption('database', $database);
     }
 

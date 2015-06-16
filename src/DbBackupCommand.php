@@ -97,7 +97,7 @@ class DbBackupCommand extends BaseCommand {
             $this->option('database'),
             $this->option('compression'),
             $this->option('destination'),
-            $root . $this->option('destinationPath')
+            $root .'/'. $this->option('destinationPath')
         ));
     }
 
