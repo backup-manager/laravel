@@ -113,7 +113,7 @@ When contributing please consider the following guidelines:
 
 ### Maintainers
 
-This package is maintained by [Mitchell van Wijngaarden](http://kooding.nl) and [Shawn McCool](http://shawnmc.cool) of [Big Name](http://heybigname.com)
+This package is maintained by [Mitchell van Wijngaarden](http://kooding.nl) and [Shawn McCool](http://shawnmc.cool).
 
 ### License
 
