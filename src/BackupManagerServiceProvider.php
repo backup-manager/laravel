@@ -1,4 +1,4 @@
-<?php namespace BackupManager\Laravel4;
+<?php namespace BackupManager\Laravel;
 
 use BackupManager\Databases;
 use BackupManager\Filesystems;
