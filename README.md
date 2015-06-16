@@ -1,10 +1,10 @@
-# Laravel 4 Driver for the Database Backup Manager
+# Laravel Driver for the Database Backup Manager
 
-This package pulls in the framework agnostic [Backup Manager](https://github.com/backup-manager/backup-manager) and provides seamless integration with **Laravel 4**. 
+This package pulls in the framework agnostic [Backup Manager](https://github.com/backup-manager/backup-manager) and provides seamless integration with **Laravel**. 
 
-Mitchell has put together a [video tour](https://www.youtube.com/watch?v=vWXy0R8OavM) of Laravel 4 integration, to give you an idea what is possible with this package.
+Mitchell has put together a [video tour](https://www.youtube.com/watch?v=vWXy0R8OavM) of Laravel integration, to give you an idea what is possible with this package.
 
-> Note: This package is for Laravel 4 integration only. For information about the base package please see [the base package repository](https://github.com/backup-manager/backup-manager).
+> Note: This package is for Laravel integration only. For information about the base package please see [the base package repository](https://github.com/backup-manager/backup-manager).
 
 ### Table of Contents
 
@@ -20,12 +20,12 @@ Mitchell has put together a [video tour](https://www.youtube.com/watch?v=vWXy0R8
 
 It's stable enough, you'll need to understand filesystem permissions.
 
-This package is actively being developed and we would like to get feedback to improve it. [Please feel free to submit feedback.](https://github.com/backup-manager/laravel-4/issues/new)
+This package is actively being developed and we would like to get feedback to improve it. [Please feel free to submit feedback.](https://github.com/backup-manager/laravel/issues/new)
 
 ### Requirements
 
 - PHP 5.5
-- Laravel 4
+- Laravel
 - MySQL support requires `mysqldump` and `mysql` command-line binaries
 - PostgreSQL support requires `pg_dump` and `psql` command-line binaries
 - Gzip support requires `gzip` and `gunzip` command-line binaries
@@ -37,7 +37,7 @@ This package is actively being developed and we would like to get feedback to im
 Run the following to include this via Composer
 
 ```shell
-composer require backup-manager/laravel-4
+composer require backup-manager/laravel
 ```
 
 Then, you'll need to select the appropriate packages for the adapters that you want to use.
@@ -61,10 +61,10 @@ composer require league/flysystem-sftp
 To install into a Laravel project, first do the composer install then add the following class to your config/app.php service providers list.
 
 ```php
-BackupManager\Laravel4\BackupManagerServiceProvider::class,
+BackupManager\Laravel\BackupManagerServiceProvider::class,
 ```
 
-Copy the `config/storage.php` file to `app/config/packages/backup-manager/laravel-4/config/storage.php` and configure it to suit your needs.
+Copy the `config/storage.php` file to `app/config/packages/backup-manager/laravel/config/storage.php` and configure it to suit your needs.
 
 The Backup Manager will make use of Laravel's database configuration. But, it won't know about any connections that might be tied to other environments, so it can be best to just list multiple connections in the `config/database.php` file.
 
@@ -103,7 +103,7 @@ When contributing please consider the following guidelines:
     2. Interfaces should NOT be suffixed with `Interface`, Traits should NOT be suffixed with `Trait`.
 - All methods and classes must contain docblocks.
 - Ensure that you submit tests that have minimal 100% coverage.
-- When planning a pull-request to add new functionality, it may be wise to [submit a proposal](https://github.com/backup-manager/laravel-4/issues/new) to ensure compatibility with the project's goals.
+- When planning a pull-request to add new functionality, it may be wise to [submit a proposal](https://github.com/backup-manager/laravel/issues/new) to ensure compatibility with the project's goals.
 
 ### Maintainers
 
@@ -111,4 +111,4 @@ This package is maintained by [Mitchell van Wijngaarden](http://kooding.nl) and 
 
 ### License
 
-This package is licensed under the [MIT license](https://github.com/backup-manager/laravel-4/blob/master/LICENSE).
+This package is licensed under the [MIT license](https://github.com/backup-manager/laravel/blob/master/LICENSE).
