@@ -66,11 +66,9 @@ To install into a Laravel project, first do the composer install then add the fo
 'BackupManager\Laravel4\BackupManagerServiceProvider',
 ```
 
-Then, publish and modify the configuration file to suit your needs.
+Copy the `config/storage.php` file to `app/config/packages/backup-manager/laravel-4/config/storage.php` and configure it to suit your needs.
 
-`php artisan config:publish backup-manager/laravel-4 --path=vendor/backup-manager/laravel-4/config`
-
-The Backup Manager will make use of Laravel's database configuration.
+The Backup Manager will make use of Laravel's database configuration. But, it won't know about any connections that might be tied to other environments, so it can be best to just list multiple connections in the `config/database.php` file.
 
 **IoC Resolution**
 
@@ -87,7 +85,7 @@ public function __construct(Manager $manager) {
 It can also be resolved manually from the container.
 
 ```php
-$manager = App::make('BackupManager\Manager');
+$manager = App::make(\BackupManager\Manager::class);
 ```
 
 **Artisan Commands**
