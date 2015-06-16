@@ -14,7 +14,7 @@
     }
   ],
   "require": {
-    "heybigname/backup-manager": "1.0",
+    "heybigname/backup-manager": "1.x",
     "php": ">=5.4.0",
     "symfony/process": "2.*",
     "illuminate/support": "4.x",
