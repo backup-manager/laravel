@@ -13,12 +13,6 @@
       "homepage": "http://heybigname.com/"
     }
   ],
-  "repositories": [
-    {
-      "type": "git",
-      "url": "https://github.com/backup-manager/backup-manager"
-    }
-  ],
   "require": {
     "heybigname/backup-manager": "1.0.x-dev",
     "php": ">=5.4.0",
@@ -40,10 +34,10 @@
     }
   },
   "license": "MIT",
-  "minimum-stability": "dev",
   "extra": {
     "branch-alias": {
       "dev-master": "1.0.x-dev"
-    }
+    },
+    "minimum-stability": "dev"
   }
 }
