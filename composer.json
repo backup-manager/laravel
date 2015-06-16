@@ -34,10 +34,5 @@
     }
   },
   "license": "MIT",
-  "extra": {
-    "branch-alias": {
-      "dev-master": "1.0"
-    },
-    "minimum-stability": "dev"
-  }
+  "minimum-stability": "dev"
 }
