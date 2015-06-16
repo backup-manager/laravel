@@ -22,7 +22,7 @@ class BackupManagerServiceProvider extends ServiceProvider {
      * @return void
      */
     public function boot() {
-        $this->package('heybigname/backup-manager', 'backup-manager', __DIR__ . '/../../..');
+        $this->package('backup-manager/laravel-4', 'backup-manager', realpath(app_path("config/packages/backup-manager/laravel-4")));
     }
 
     /**
