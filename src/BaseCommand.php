@@ -5,7 +5,7 @@ use InvalidArgumentException;
 
 /**
  * Class BaseCommand
- * @package BackupManager\Laravel4
+ * @package BackupManager\Laravel
  */
 class BaseCommand extends Command {
 

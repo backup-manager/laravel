@@ -10,9 +10,9 @@ use BackupManager\ShellProcessing\ShellProcessor;
 
 /**
  * Class BackupManagerServiceProvider
- * @package BackupManager\Laravel4
+ * @package BackupManager\Laravel
  */
-class BackupManagerServiceProvider extends ServiceProvider {
+class Laravel4BackupManagerServiceProvider extends ServiceProvider {
 
     protected $defer = true;
 
@@ -102,9 +102,9 @@ class BackupManagerServiceProvider extends ServiceProvider {
      */
     private function registerArtisanCommands() {
         $this->commands([
-            \BackupManager\Laravel4\DbBackupCommand::class,
-            \BackupManager\Laravel4\DbRestoreCommand::class,
-            \BackupManager\Laravel4\DbListCommand::class
+            \BackupManager\Laravel\DbBackupCommand::class,
+            \BackupManager\Laravel\DbRestoreCommand::class,
+            \BackupManager\Laravel\DbListCommand::class
         ]);
     }
 

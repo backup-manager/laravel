@@ -7,7 +7,7 @@ use BackupManager\Filesystems\FilesystemProvider;
 
 /**
  * Class ManagerBackupCommand
- * @package BackupManager\Laravel4
+ * @package BackupManager\Laravel
  */
 class DbBackupCommand extends BaseCommand {
 
