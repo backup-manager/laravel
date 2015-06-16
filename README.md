@@ -12,8 +12,6 @@ Mitchell has put together a [video tour](https://www.youtube.com/watch?v=vWXy0R8
 - [Requirements](#requirements)
 - [Installation](#installation)
 - [Usage](#usage)
-- [Integrations](#integrations)
-    - [Laravel](#laravel)
 - [Contribution Guidelines](#contribution-guidelines)
 - [Maintainers](#maintainers)
 - [License](#license)
@@ -72,7 +70,7 @@ The Backup Manager will make use of Laravel's database configuration. But, it wo
 
 **IoC Resolution**
 
-`Manager` can be automatically resolved through constructor injection thanks to Laravel's IoC container.
+`BackupManager\Manager` can be automatically resolved through constructor injection thanks to Laravel's IoC container.
 
 ```php
 use BackupManager\Manager;
