@@ -13,8 +13,14 @@
       "homepage": "http://heybigname.com/"
     }
   ],
+  "repositories": [
+    {
+      "type": "git",
+      "url": "https://github.com/backup-manager/backup-manager"
+    }
+  ],
   "require": {
-    "heybigname/backup-manager": "1.0.x-dev",
+    "heybigname/backup-manager": "1.0",
     "php": ">=5.4.0",
     "symfony/process": "2.*",
     "illuminate/support": "4.x",
@@ -36,7 +42,7 @@
   "license": "MIT",
   "extra": {
     "branch-alias": {
-      "dev-master": "1.0.x-dev"
+      "dev-master": "1.0"
     },
     "minimum-stability": "dev"
   }
