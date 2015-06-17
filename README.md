@@ -70,7 +70,7 @@ or
 BackupManager\Laravel\Laravel5BackupManagerServiceProvider::class,
 ```
 
-Copy the `config/storage.php` file to `app/config/packages/backup-manager/laravel/config/storage.php` and configure it to suit your needs.
+Copy the `config/backup-manager.php` file to `app/config/backup-manager.php` and configure it to suit your needs.
 
 The Backup Manager will make use of Laravel's database configuration. But, it won't know about any connections that might be tied to other environments, so it can be best to just list multiple connections in the `config/database.php` file.
 
