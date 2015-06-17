@@ -10,9 +10,9 @@ use BackupManager\ShellProcessing\ShellProcessor;
 
 /**
  * Class BackupManagerServiceProvider
- * @package BackupManager\Laravel
+ * @package BackupManager\Integrations\Laravel
  */
-class Laravel4BackupManagerServiceProvider extends ServiceProvider {
+class Laravel5BackupManagerServiceProvider extends ServiceProvider {
 
     protected $defer = true;
 
@@ -22,7 +22,8 @@ class Laravel4BackupManagerServiceProvider extends ServiceProvider {
      * @return void
      */
     public function boot() {
-        $this->package('backup-manager/laravel-4', 'backup-manager', realpath(app_path("config/packages/backup-manager/laravel-4")));
+        $configPath = __DIR__ . '/../../../config';
+        $this->publishes([$configPath . "/backup-manager.php" => config_path('backup-manager.php')], 'backup-manager');
     }
 
     /**
@@ -31,6 +32,9 @@ class Laravel4BackupManagerServiceProvider extends ServiceProvider {
      * @return void
      */
     public function register() {
+
+        $configPath = __DIR__ . '/../../../config';
+        $this->mergeConfigFrom($configPath . '/backup-manager.php', 'backup-manager');
         $this->registerFilesystemProvider();
         $this->registerDatabaseProvider();
         $this->registerCompressorProvider();
@@ -44,8 +48,8 @@ class Laravel4BackupManagerServiceProvider extends ServiceProvider {
      * @return void
      */
     private function registerFilesystemProvider() {
-        $this->app->bind(\BackupManager\Filesystems\FilesystemProvider::class, function ($app) {
-            $provider = new Filesystems\FilesystemProvider(new Config($app['config']['backup-manager::storage']));
+        $this->app->bind('BackupManager\Filesystems\FilesystemProvider', function ($app) {
+            $provider = new Filesystems\FilesystemProvider(new Config($app['config']['backup-manager']));
             $provider->add(new Filesystems\Awss3Filesystem);
             $provider->add(new Filesystems\DropboxFilesystem);
             $provider->add(new Filesystems\FtpFilesystem);
@@ -62,7 +66,7 @@ class Laravel4BackupManagerServiceProvider extends ServiceProvider {
      * @return void
      */
     private function registerDatabaseProvider() {
-        $this->app->bind(\BackupManager\Databases\DatabaseProvider::class, function ($app) {
+        $this->app->bind('BackupManager\Databases\DatabaseProvider', function ($app) {
             $provider = new Databases\DatabaseProvider($this->getDatabaseConfig($app['config']['database.connections']));
             $provider->add(new Databases\MysqlDatabase);
             $provider->add(new Databases\PostgresqlDatabase);
@@ -76,7 +80,7 @@ class Laravel4BackupManagerServiceProvider extends ServiceProvider {
      * @return void
      */
     private function registerCompressorProvider() {
-        $this->app->bind(\BackupManager\Compressors\CompressorProvider::class, function () {
+        $this->app->bind('BackupManager\Compressors\CompressorProvider', function () {
             $provider = new Compressors\CompressorProvider;
             $provider->add(new Compressors\GzipCompressor);
             $provider->add(new Compressors\NullCompressor);
@@ -90,7 +94,7 @@ class Laravel4BackupManagerServiceProvider extends ServiceProvider {
      * @return void
      */
     private function registerShellProcessor() {
-        $this->app->bind(\BackupManager\ShellProcessing\ShellProcessor::class, function () {
+        $this->app->bind('BackupManager\ShellProcessing\ShellProcessor', function () {
             return new ShellProcessor(new Process(''));
         });
     }
@@ -102,9 +106,9 @@ class Laravel4BackupManagerServiceProvider extends ServiceProvider {
      */
     private function registerArtisanCommands() {
         $this->commands([
-            \BackupManager\Laravel\DbBackupCommand::class,
-            \BackupManager\Laravel\DbRestoreCommand::class,
-            \BackupManager\Laravel\DbListCommand::class
+            'BackupManager\Integrations\Laravel\DbBackupCommand',
+            'BackupManager\Integrations\Laravel\DbRestoreCommand',
+            'BackupManager\Integrations\Laravel\DbListCommand',
         ]);
     }
 
@@ -115,9 +119,9 @@ class Laravel4BackupManagerServiceProvider extends ServiceProvider {
      */
     public function provides() {
         return [
-            \BackupManager\Filesystems\FilesystemProvider::class,
-            \BackupManager\Databases\DatabaseProvider::class,
-            \BackupManager\ShellProcessing\ShellProcessor::class,
+            'BackupManager\Filesystems\FilesystemProvider',
+            'BackupManager\Databases\DatabaseProvider',
+            'BackupManager\ShellProcessing\ShellProcessor',
         ];
     }
 
