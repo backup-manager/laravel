@@ -1,6 +1,6 @@
 {
   "name": "backup-manager/laravel",
-  "description": "Laravel Integration for the Backup Manager - dump to and restore databases from S3, Dropbox, FTP, and SFTP.",
+  "description": "Database backup manager seamlessly integrated with Laravel 4 or 5 with user-definable procedures and support for S3, Dropbox, FTP, SFTP, and more.",
   "authors": [
     {
       "name": "Shawn McCool",
