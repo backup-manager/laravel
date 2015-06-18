@@ -22,8 +22,7 @@ class Laravel5BackupManagerServiceProvider extends ServiceProvider {
      * @return void
      */
     public function boot() {
-        $configPath = __DIR__ . '/../../../config';
-        $this->publishes([$configPath . "/backup-manager.php" => config_path('backup-manager.php')], 'backup-manager');
+        $this->publishes([config_path() . "/backup-manager.php" => config_path('backup-manager.php')], 'backup-manager');
     }
 
     /**
@@ -33,8 +32,7 @@ class Laravel5BackupManagerServiceProvider extends ServiceProvider {
      */
     public function register() {
 
-        $configPath = __DIR__ . '/../../../config';
-        $this->mergeConfigFrom($configPath . '/backup-manager.php', 'backup-manager');
+        $this->mergeConfigFrom(config_path() . '/backup-manager.php', 'backup-manager');
         $this->registerFilesystemProvider();
         $this->registerDatabaseProvider();
         $this->registerCompressorProvider();
@@ -106,9 +104,9 @@ class Laravel5BackupManagerServiceProvider extends ServiceProvider {
      */
     private function registerArtisanCommands() {
         $this->commands([
-            'BackupManager\Integrations\Laravel\DbBackupCommand',
-            'BackupManager\Integrations\Laravel\DbRestoreCommand',
-            'BackupManager\Integrations\Laravel\DbListCommand',
+            'BackupManager\Laravel\DbBackupCommand',
+            'BackupManager\Laravel\DbRestoreCommand',
+            'BackupManager\Laravel\DbListCommand',
         ]);
     }
 
