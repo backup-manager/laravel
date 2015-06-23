@@ -45,7 +45,7 @@ class Laravel4BackupManagerServiceProvider extends ServiceProvider {
      */
     private function registerFilesystemProvider() {
         $this->app->bind(\BackupManager\Filesystems\FilesystemProvider::class, function ($app) {
-            $provider = new Filesystems\FilesystemProvider(new Config($app['config']['backup-manager::storage']));
+            $provider = new Filesystems\FilesystemProvider(new Config($app['config']['backup-manager']));
             $provider->add(new Filesystems\Awss3Filesystem);
             $provider->add(new Filesystems\DropboxFilesystem);
             $provider->add(new Filesystems\FtpFilesystem);
