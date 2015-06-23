@@ -61,7 +61,7 @@ composer require league/flysystem-sftp
 To install into a Laravel 4 project, first do the composer install then add the following class to your config/app.php service providers list.
 
 ```php
-BackupManager\Laravel\Laravel4BackupManagerServiceProvider::class,
+BackupManager\Laravel\Laravel4ServiceProvider::class,
 ```
 
 Copy the `vendor/backup-manager/laravel/config/backup-manager.php` file to `app/config/backup-manager.php` and configure it to suit your needs.
@@ -71,7 +71,7 @@ Copy the `vendor/backup-manager/laravel/config/backup-manager.php` file to `app/
 To install into a Laravel project, first do the composer install then add the following class to your config/app.php service providers list.
 
 ```php
-BackupManager\Laravel\Laravel5BackupManagerServiceProvider::class,
+BackupManager\Laravel\Laravel5ServiceProvider::class,
 ```
 
 Publish the storage configuration file.
