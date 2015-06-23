@@ -38,6 +38,5 @@
       "dev-master": "1.0-dev"
     }
   },
-  "license": "MIT",
-  "minimum-stability": "dev"
+  "license": "MIT"
 }
