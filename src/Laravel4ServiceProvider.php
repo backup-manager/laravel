@@ -12,8 +12,9 @@ use BackupManager\ShellProcessing\ShellProcessor;
  * Class BackupManagerServiceProvider
  * @package BackupManager\Laravel
  */
-class Laravel4BackupManagerServiceProvider extends ServiceProvider {
+class Laravel4ServiceProvider extends ServiceProvider {
 
+    /** @var bool */
     protected $defer = true;
 
     /**
@@ -102,9 +103,9 @@ class Laravel4BackupManagerServiceProvider extends ServiceProvider {
      */
     private function registerArtisanCommands() {
         $this->commands([
-            \BackupManager\Laravel\DbBackupCommand::class,
-            \BackupManager\Laravel\DbRestoreCommand::class,
-            \BackupManager\Laravel\DbListCommand::class
+            \BackupManager\Laravel\Laravel4DbBackupCommand::class,
+//            \BackupManager\Laravel\DbRestoreCommand::class,
+//            \BackupManager\Laravel\DbListCommand::class
         ]);
     }
 
@@ -121,6 +122,10 @@ class Laravel4BackupManagerServiceProvider extends ServiceProvider {
         ];
     }
 
+    /**
+     * @param $connections
+     * @return Config
+     */
     private function getDatabaseConfig($connections) {
         $mapped = array_map(function ($connection) {
             if ( ! in_array($connection['driver'], ['mysql', 'pgsql'])) {

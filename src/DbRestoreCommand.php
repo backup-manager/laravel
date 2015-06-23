@@ -5,7 +5,12 @@ use BackupManager\Databases\DatabaseProvider;
 use BackupManager\Procedures\RestoreProcedure;
 use BackupManager\Filesystems\FilesystemProvider;
 
-class DbRestoreCommand extends BaseCommand {
+/**
+ * Class DbRestoreCommand
+ * @package BackupManager\Laravel
+ */
+class DbRestoreCommand extends Command {
+    use AutoComplete;
 
     /**
      * The console command name.
@@ -129,6 +134,9 @@ class DbRestoreCommand extends BaseCommand {
         }
     }
 
+    /**
+     *
+     */
     private function askSource() {
         $providers = $this->filesystems->getAvailableProviders();
         $formatted = implode(', ', $providers);
@@ -137,6 +145,9 @@ class DbRestoreCommand extends BaseCommand {
         $this->input->setOption('source', $source);
     }
 
+    /**
+     *
+     */
     private function askSourcePath() {
         // ask path
         $root = $this->filesystems->getConfig($this->option('source'), 'root');
@@ -175,6 +186,9 @@ class DbRestoreCommand extends BaseCommand {
         $this->input->setOption('sourcePath', "{$path}/{$filename}");
     }
 
+    /**
+     *
+     */
     private function askDatabase() {
         $providers = $this->databases->getAvailableProviders();
         $formatted = implode(', ', $providers);
@@ -183,6 +197,9 @@ class DbRestoreCommand extends BaseCommand {
         $this->input->setOption('database', $database);
     }
 
+    /**
+     *
+     */
     private function askCompression() {
         $types = ['null', 'gzip'];
         $formatted = implode(', ', $types);
@@ -236,6 +253,11 @@ class DbRestoreCommand extends BaseCommand {
         ];
     }
 
+    /**
+     * @param $bytes
+     * @param int $precision
+     * @return string
+     */
     private function formatBytes($bytes, $precision = 2) {
         $units = ['B', 'KB', 'MB', 'GB', 'TB'];
         $bytes = max($bytes, 0);

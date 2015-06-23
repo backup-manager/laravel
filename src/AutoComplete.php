@@ -1,14 +1,10 @@
 <?php namespace BackupManager\Laravel;
 
-use Illuminate\Console\Command;
-use InvalidArgumentException;
-
 /**
- * Class BaseCommand
+ * Class AutoComplete
  * @package BackupManager\Laravel
  */
-class BaseCommand extends Command {
-
+trait AutoComplete {
     /**
      * @param $dialog
      * @param array $list
@@ -27,18 +23,5 @@ class BaseCommand extends Command {
         };
         $helper = $this->getHelperSet()->get('dialog');
         return $helper->askAndValidate($this->output, "<question>{$dialog}</question>", $validation, false, $default, $list);
-    }
-
-    /**
-     * @param array $headers
-     * @param array $rows
-     * @internal param string $style
-     * @return void
-     */
-    public function table(array $headers, array $rows, $style = 'default') {
-        $table = $this->getHelperSet()->get('table');
-        $table->setHeaders($headers);
-        $table->setRows($rows);
-        $table->render($this->output);
     }
 }

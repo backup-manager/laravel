@@ -3,7 +3,12 @@
 use Symfony\Component\Console\Input\InputOption;
 use BackupManager\Filesystems\FilesystemProvider;
 
-class DbListCommand extends BaseCommand {
+/**
+ * Class DbListCommand
+ * @package BackupManager\Laravel
+ */
+class DbListCommand extends Command {
+    use AutoComplete;
 
     /**
      * The console command name.
@@ -39,6 +44,9 @@ class DbListCommand extends BaseCommand {
     private $missingArguments;
 
 
+    /**
+     * @param FilesystemProvider $filesystems
+     */
     public function __construct(FilesystemProvider $filesystems) {
         parent::__construct();
         $this->filesystems = $filesystems;
@@ -111,6 +119,9 @@ class DbListCommand extends BaseCommand {
         }
     }
 
+    /**
+     *
+     */
     private function askSource() {
         $providers = $this->filesystems->getAvailableProviders();
         $formatted = implode(', ', $providers);
@@ -119,6 +130,9 @@ class DbListCommand extends BaseCommand {
         $this->input->setOption('source', $source);
     }
 
+    /**
+     *
+     */
     private function askPath() {
         $root = $this->filesystems->getConfig($this->option('source'), 'root');
         $path = $this->ask("From which path?<comment> {$root}</comment>");
@@ -166,6 +180,11 @@ class DbListCommand extends BaseCommand {
         ];
     }
 
+    /**
+     * @param $bytes
+     * @param int $precision
+     * @return string
+     */
     private function formatBytes($bytes, $precision = 2) {
         $units = ['B', 'KB', 'MB', 'GB', 'TB'];
         $bytes = max($bytes, 0);

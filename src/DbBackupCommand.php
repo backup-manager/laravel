@@ -9,7 +9,8 @@ use BackupManager\Filesystems\FilesystemProvider;
  * Class ManagerBackupCommand
  * @package BackupManager\Laravel
  */
-class DbBackupCommand extends BaseCommand {
+class DbBackupCommand extends Command {
+    use AutoComplete;
 
     /**
      * The console command name.
