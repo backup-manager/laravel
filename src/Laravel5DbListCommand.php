@@ -3,9 +3,9 @@
 use Illuminate\Console\Command;
 
 /**
- * Class Laravel5DbBackupCommand
+ * Class Laravel5DbListCommand
  * @package BackupManager\Laravel
  */
-class Laravel5DbBackupCommand extends DbBackupCommand {
+class Laravel5DbListCommand extends DbListCommand {
     use Laravel5Compatibility;
 }
