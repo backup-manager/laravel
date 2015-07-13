@@ -17,7 +17,7 @@ trait AutoComplete {
     public function autocomplete($dialog, array $list, $default = null) {
         $validation = function ($item) use ($list) {
             if ( ! in_array($item, array_values($list))) {
-                throw new InvalidArgumentException("{$item} does not exist.");
+                throw new \InvalidArgumentException("{$item} does not exist.");
             }
             return $item;
         };
