@@ -77,7 +77,7 @@ BackupManager\Laravel\Laravel5ServiceProvider::class,
 Publish the storage configuration file.
 
 ```php 
-php artisan vendor:publish --provider="BackupManager\Laravel\Laravel5BackupManagerServiceProvider"
+php artisan vendor:publish --provider="BackupManager\Laravel\Laravel5ServiceProvider"
 ```
 
 The Backup Manager will make use of Laravel's database configuration. But, it won't know about any connections that might be tied to other environments, so it can be best to just list multiple connections in the `config/database.php` file.
