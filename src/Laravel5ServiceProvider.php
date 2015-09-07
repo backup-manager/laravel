@@ -50,6 +50,7 @@ class Laravel5ServiceProvider extends ServiceProvider {
         $this->app->bind(\BackupManager\Filesystems\FilesystemProvider::class, function ($app) {
             $provider = new Filesystems\FilesystemProvider(new Config($app['config']['backup-manager']));
             $provider->add(new Filesystems\Awss3Filesystem);
+            $provider->add(new Filesystems\GcsFilesystem);
             $provider->add(new Filesystems\DropboxFilesystem);
             $provider->add(new Filesystems\FtpFilesystem);
             $provider->add(new Filesystems\LocalFilesystem);
