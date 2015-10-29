@@ -109,7 +109,7 @@ All will prompt you with simple questions to successfully execute the command.
 **Example Command for 24hour scheduled cronjob**
 
 ```
-    php artisan db:backup --database=mysql --destination=dropbox --destinationPath=``date +\%Y/%d-%m-%Y`` --compression=gzip
+php artisan db:backup --database=mysql --destination=dropbox --destinationPath=`date +\%Y/%d-%m-%Y` --compression=gzip
 ```
 
 This command will backup your database to dropbox using mysql and gzip compresion in path /backups/YEAR/DATE.gz (ex: /backups/2015/29-10-2015.gz)
