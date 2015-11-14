@@ -13,6 +13,13 @@ return [
         'bucket' => '',
         'root'   => '',
     ],
+    'gcs' => [
+        'type' => 'Gcs',
+        'key'    => '',
+        'secret' => '',
+        'bucket' => '',
+        'root'   => '',
+    ],
     'rackspace' => [
         'type' => 'Rackspace',
         'username' => '',
