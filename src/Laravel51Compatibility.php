@@ -4,7 +4,7 @@
  * Class Laravel5Compatibility
  * @package BackupManager\Laravel
  */
-trait Laravel5Compatibility {
+trait Laravel51Compatibility {
     /**
      * @param array $headers
      * @param array $rows
