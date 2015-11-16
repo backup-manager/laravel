@@ -68,9 +68,13 @@ Copy the `vendor/backup-manager/laravel/config/backup-manager.php` file to `app/
 
 #### Laravel 5 Configuration
 
-To install into a Laravel project, first do the composer install then add the following class to your config/app.php service providers list.
+To install into a Laravel project, first do the composer install then add *ONE *of the following classes to your config/app.php service providers list.
 
 ```php
+// FOR LARAVEL 5.0 ONLY
+BackupManager\Laravel\Laravel50ServiceProvider::class,
+
+// FOR LARAVEL 5.1 AND ABOVE
 BackupManager\Laravel\Laravel5ServiceProvider::class,
 ```
 
