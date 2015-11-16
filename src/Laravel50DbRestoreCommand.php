@@ -7,5 +7,5 @@ use Illuminate\Console\Command;
  * @package BackupManager\Laravel
  */
 class Laravel50DbRestoreCommand extends DbRestoreCommand {
-    use Laravel51Compatibility;
+    use Laravel50Compatibility;
 }

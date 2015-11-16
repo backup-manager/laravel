@@ -7,5 +7,5 @@ use Illuminate\Console\Command;
  * @package BackupManager\Laravel
  */
 class Laravel50DbListCommand extends DbListCommand {
-    use Laravel51Compatibility;
+    use Laravel50Compatibility;
 }
