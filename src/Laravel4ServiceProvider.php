@@ -48,6 +48,7 @@ class Laravel4ServiceProvider extends ServiceProvider {
         $this->app->bind(\BackupManager\Filesystems\FilesystemProvider::class, function ($app) {
             $provider = new Filesystems\FilesystemProvider(new Config($app['config']['backup-manager']));
             $provider->add(new Filesystems\Awss3Filesystem);
+            $provider->add(new Filesystems\GcsFilesystem);
             $provider->add(new Filesystems\DropboxFilesystem);
             $provider->add(new Filesystems\FtpFilesystem);
             $provider->add(new Filesystems\LocalFilesystem);
@@ -92,7 +93,7 @@ class Laravel4ServiceProvider extends ServiceProvider {
      */
     private function registerShellProcessor() {
         $this->app->bind(\BackupManager\ShellProcessing\ShellProcessor::class, function () {
-            return new ShellProcessor(new Process(''));
+            return new ShellProcessor(new Process('', null, null, null, null));
         });
     }
 

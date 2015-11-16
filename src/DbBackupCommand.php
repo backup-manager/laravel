@@ -99,7 +99,7 @@ class DbBackupCommand extends Command {
             $this->option('database'),
             $this->option('compression'),
             $this->option('destination'),
-            $root .'/'. $this->option('destinationPath')
+            $root .DIRECTORY_SEPARATOR. $this->option('destinationPath')
         ));
     }
 

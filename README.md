@@ -43,7 +43,7 @@ composer require backup-manager/laravel
 Then, you'll need to select the appropriate packages for the adapters that you want to use.
 
 ```shell
-# to support s3
+# to support s3 or google cs
 composer require league/flysystem-aws-s3-v2
 
 # to support dropbox
@@ -77,7 +77,7 @@ BackupManager\Laravel\Laravel5ServiceProvider::class,
 Publish the storage configuration file.
 
 ```php 
-php artisan vendor:publish --provider="BackupManager\Laravel\Laravel5BackupManagerServiceProvider"
+php artisan vendor:publish --provider="BackupManager\Laravel\Laravel5ServiceProvider"
 ```
 
 The Backup Manager will make use of Laravel's database configuration. But, it won't know about any connections that might be tied to other environments, so it can be best to just list multiple connections in the `config/database.php` file.
@@ -105,6 +105,14 @@ $manager = App::make(\BackupManager\Manager::class);
 There are three commands available `db:backup`, `db:restore` and `db:list`.
 
 All will prompt you with simple questions to successfully execute the command.
+
+**Example Command for 24hour scheduled cronjob**
+
+```
+php artisan db:backup --database=mysql --destination=dropbox --destinationPath=`date +\%Y/%d-%m-%Y` --compression=gzip
+```
+
+This command will backup your database to dropbox using mysql and gzip compresion in path /backups/YEAR/DATE.gz (ex: /backups/2015/29-10-2015.gz)
 
 ### Contribution Guidelines
 
