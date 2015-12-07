@@ -11,7 +11,7 @@ This package pulls in the framework agnostic [Backup Manager](https://github.com
 - [Stability Notice](#stability-notice)
 - [Requirements](#requirements)
 - [Installation](#installation)
-- [Usage](#usage)
+- [Scheduling Backups](#scheduling)
 - [Contribution Guidelines](#contribution-guidelines)
 - [Maintainers](#maintainers)
 - [License](#license)
@@ -118,6 +118,24 @@ php artisan db:backup --database=mysql --destination=dropbox --destinationPath=`
 
 This command will backup your database to dropbox using mysql and gzip compresion in path /backups/YEAR/DATE.gz (ex: /backups/2015/29-10-2015.gz)
 
+### Scheduling Backups
+
+It's possible to schedule backups using Laravel's scheduler.
+
+```PHP
+/**
+ * Define the application's command schedule.
+ *
+ * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
+ * @return void
+ */
+protected function schedule(Schedule $schedule) {
+    $date = Carbon::now()->toW3cString();
+    $environment = env('APP_ENV');
+    $schedule->command("db:backup --database=mysql --destination=s3 --destinationPath=/{$environment}/projectname_{$environment}_{$date} --compression=gzip")->twiceDaily(13,21);
+}
+```
+    
 ### Contribution Guidelines
 
 We recommend using the vagrant configuration supplied with this package for development and contribution. Simply install VirtualBox, Vagrant, and Ansible then run `vagrant up` in the root folder. A virtualmachine specifically designed for development of the package will be built and launched for you.
