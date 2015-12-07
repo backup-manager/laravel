@@ -11,7 +11,7 @@ This package pulls in the framework agnostic [Backup Manager](https://github.com
 - [Stability Notice](#stability-notice)
 - [Requirements](#requirements)
 - [Installation](#installation)
-- [Scheduling Backups](#scheduling)
+- [Scheduling Backups](#scheduling-backups)
 - [Contribution Guidelines](#contribution-guidelines)
 - [Maintainers](#maintainers)
 - [License](#license)
