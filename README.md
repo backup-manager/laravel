@@ -88,7 +88,7 @@ The Backup Manager will make use of Laravel's database configuration. But, it wo
 
 #### Lumen Configuration
 
-To install into a Lumen project, first do the composer install then add *ONE* of the following service providers to your `bootstrap/app.php`.
+To install into a Lumen project, first do the composer install then add the configuration file loader and *ONE* of the following service providers to your `bootstrap/app.php`.
 
 ```php
 // FOR LUMEN 5.0 ONLY
