@@ -1,5 +1,6 @@
 <?php namespace BackupManager\Laravel;
 
+use BackupManager\Filesystems\Destination;
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputOption;
 use BackupManager\Databases\DatabaseProvider;
@@ -85,11 +86,17 @@ class DbBackupCommand extends Command {
             $this->validateArguments();
         }
 
+        $destinations = [
+            new Destination(
+                $this->option('destination'),
+                $this->option('destinationPath')
+            )
+        ];
+
         $this->info('Dumping database and uploading...');
         $this->backupProcedure->run(
             $this->option('database'),
-            $this->option('destination'),
-            $this->option('destinationPath'),
+            $destinations,
             $this->option('compression')
         );
 
