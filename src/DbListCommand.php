@@ -76,7 +76,7 @@ class DbListCommand extends Command {
             if ($file['type'] == 'dir') continue;
             $rows[] = [
                 $file['basename'],
-                $file['extension'],
+                key_exists('extension', $file) ? $file['extension'] : null,
                 $this->formatBytes($file['size']),
                 date('D j Y  H:i:s', $file['timestamp'])
             ];
