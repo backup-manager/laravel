@@ -1,5 +1,8 @@
 <?php namespace BackupManager\Laravel;
 
+use Symfony\Component\Console\Helper\Table;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
+
 /**
  * Class Laravel5Compatibility
  * @package BackupManager\Laravel
@@ -12,7 +15,14 @@ trait Laravel51Compatibility {
      * @return void
      */
     public function table(array $headers, $rows, $style = 'default') {
-        $table = $this->getHelperSet()->get('table');
+        try {
+            $table = $this->getHelperSet()->get('table');
+        } catch (InvalidArgumentException $error) {
+            //
+        } finally {
+            $table = new Table($this->output);
+        }
+
         $table->setHeaders($headers);
         $table->setRows($rows);
         $table->render($this->output);
