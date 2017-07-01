@@ -47,7 +47,7 @@ Then, you'll need to select the appropriate packages for the adapters that you w
 composer require league/flysystem-aws-s3-v3
 
 # to support dropbox
-composer require league/flysystem-dropbox
+composer require srmklive/flysystem-dropbox-v2
 
 # to support rackspace
 composer require league/flysystem-rackspace
