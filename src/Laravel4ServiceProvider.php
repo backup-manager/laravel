@@ -13,6 +13,7 @@ use BackupManager\ShellProcessing\ShellProcessor;
  * @package BackupManager\Laravel
  */
 class Laravel4ServiceProvider extends ServiceProvider {
+    use GetDatabaseConfig;
 
     /** @var bool */
     protected $defer = true;
@@ -121,37 +122,5 @@ class Laravel4ServiceProvider extends ServiceProvider {
             \BackupManager\Databases\DatabaseProvider::class,
             \BackupManager\ShellProcessing\ShellProcessor::class,
         ];
-    }
-
-    /**
-     * @param $connections
-     * @return Config
-     */
-    private function getDatabaseConfig($connections) {
-        $mapped = array_map(function ($connection) {
-            if ( ! in_array($connection['driver'], ['mysql', 'pgsql'])) {
-                return;
-            }
-
-            if (isset($connection['port'])) {
-                $port = $connection['port'];
-            } else {
-                if ($connection['driver'] == 'mysql') {
-                    $port = '3306';
-                } elseif ($connection['driver'] == 'pgsql') {
-                    $port = '5432';
-                }
-            }
-
-            return [
-                'type'     => $connection['driver'],
-                'host'     => $connection['host'],
-                'port'     => $port,
-                'user'     => $connection['username'],
-                'pass'     => $connection['password'],
-                'database' => $connection['database'],
-            ];
-        }, $connections);
-        return new Config($mapped);
     }
 }

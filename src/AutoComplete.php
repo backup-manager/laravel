@@ -30,9 +30,8 @@ trait AutoComplete {
             return $this->useSymfontDialog($dialog, $list, $default, $validation);
         } catch (InvalidArgumentException $error) {
             //
-        } finally {
-            return $this->useSymfonyQuestion($dialog, $default, $validation);
         }
+        return $this->useSymfonyQuestion($dialog, $default, $validation);
     }
 
     /**
