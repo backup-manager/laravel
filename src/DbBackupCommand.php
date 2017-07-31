@@ -36,6 +36,13 @@ class DbBackupCommand extends Command {
     private $required = ['database', 'destination', 'destinationPath', 'compression'];
 
     /**
+     * Optional timestamp.
+     *
+     * @var string
+     */
+    private $timestamp;
+
+    /**
      * The missing arguments.
      *
      * @var array
@@ -80,6 +87,8 @@ class DbBackupCommand extends Command {
      * @return mixed
      */
     public function fire() {
+        $this->timestamp = date($this->option('timestamp'));
+
         if ($this->isMissingArguments()) {
             $this->displayMissingArguments();
             $this->promptForMissingArgumentValues();
@@ -89,7 +98,7 @@ class DbBackupCommand extends Command {
         $destinations = [
             new Destination(
                 $this->option('destination'),
-                $this->option('destinationPath')
+                $this->option('destinationPath') . $this->timestamp
             )
         ];
 
@@ -106,7 +115,7 @@ class DbBackupCommand extends Command {
             $this->option('database'),
             $this->option('compression'),
             $this->option('destination'),
-            $root .DIRECTORY_SEPARATOR. $this->option('destinationPath')
+            $destinations[0]->destinationPath()
         ));
     }
 
@@ -191,7 +200,7 @@ class DbBackupCommand extends Command {
         $this->info(sprintf('Do you want to create a backup of <comment>%s</comment>, store it on <comment>%s</comment> at <comment>%s</comment> and compress it to <comment>%s</comment>?',
             $this->option('database'),
             $this->option('destination'),
-            $root . $this->option('destinationPath'),
+            $root . $this->option('destinationPath') . $this->timestamp,
             $this->option('compression')
         ));
         $this->line('');
@@ -224,6 +233,7 @@ class DbBackupCommand extends Command {
             ['destination', null, InputOption::VALUE_OPTIONAL, 'Destination configuration name', null],
             ['destinationPath', null, InputOption::VALUE_OPTIONAL, 'File destination path', null],
             ['compression', null, InputOption::VALUE_OPTIONAL, 'Compression type', null],
+            ['timestamp', null, InputOption::VALUE_OPTIONAL, 'Append timestamp to filename', null],
         ];
     }
 }
