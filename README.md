@@ -1,6 +1,6 @@
 # Laravel Driver for the Database Backup Manager
 
-This package pulls in the framework agnostic [Backup Manager](https://github.com/backup-manager/backup-manager) and provides seamless integration with **Laravel**. 
+This package pulls in the framework agnostic [Backup Manager](https://github.com/backup-manager/backup-manager) and provides seamless integration with **Laravel**.
 
 [Watch a video tour](https://www.youtube.com/watch?v=vWXy0R8OavM) to get an idea what is possible with this package.
 
@@ -80,7 +80,7 @@ BackupManager\Laravel\Laravel5ServiceProvider::class,
 
 Publish the storage configuration file.
 
-```php 
+```php
 php artisan vendor:publish --provider="BackupManager\Laravel\Laravel5ServiceProvider"
 ```
 
@@ -129,10 +129,10 @@ All will prompt you with simple questions to successfully execute the command.
 **Example Command for 24hour scheduled cronjob**
 
 ```
-php artisan db:backup --database=mysql --destination=dropbox --destinationPath=`date +\%Y/%d-%m-%Y` --compression=gzip
+php artisan db:backup --database=mysql --destination=dropbox --destinationPath=project --timestamp="d-m-Y" --compression=gzip
 ```
 
-This command will backup your database to dropbox using mysql and gzip compresion in path /backups/YEAR/DATE.gz (ex: /backups/2015/29-10-2015.gz)
+This command will backup your database to dropbox using mysql and gzip compresion in path /backups/project/DATE.gz (ex: /backups/project/31-7-2015.gz)
 
 ### Scheduling Backups
 
@@ -145,15 +145,14 @@ It's possible to schedule backups using Laravel's scheduler.
  * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
  * @return void
  */
-protected function schedule(Schedule $schedule) {
-    $date = Carbon::now()->toW3cString();
-    $environment = config('app.env');
-    $schedule->command(
-        "db:backup --database=mysql --destination=s3 --destinationPath=/{$environment}/projectname_{$environment}_{$date} --compression=gzip"
-        )->twiceDaily(13,21);
-}
+ protected function schedule(Schedule $schedule) {
+     $environment = config('app.env');
+     $schedule->command(
+         "db:backup --database=mysql --destination=s3 --destinationPath=/{$environment}/projectname --timestamp="Y_m_d_H_i_s" --compression=gzip"
+         )->twiceDaily(13,21);
+ }
 ```
-    
+
 ### Contribution Guidelines
 
 We recommend using the vagrant configuration supplied with this package for development and contribution. Simply install VirtualBox, Vagrant, and Ansible then run `vagrant up` in the root folder. A virtualmachine specifically designed for development of the package will be built and launched for you.
