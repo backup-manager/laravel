@@ -102,6 +102,7 @@ class DbBackupCommand extends Command {
             )
         ];
 
+        $this->info('Dumping database and uploading...');
         $this->backupProcedure->run(
             $this->option('database'),
             $destinations,
