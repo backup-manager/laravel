@@ -147,7 +147,7 @@ It's possible to schedule backups using Laravel's scheduler.
  */
 protected function schedule(Schedule $schedule) {
     $date = Carbon::now()->toW3cString();
-    $environment = env('APP_ENV');
+    $environment = config('app.env');
     $schedule->command(
         "db:backup --database=mysql --destination=s3 --destinationPath=/{$environment}/projectname_{$environment}_{$date} --compression=gzip"
         )->twiceDaily(13,21);
