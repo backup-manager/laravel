@@ -74,8 +74,11 @@ To install into a Laravel project, first do the composer install then add *ONE *
 // FOR LARAVEL 5.0 ONLY
 BackupManager\Laravel\Laravel50ServiceProvider::class,
 
-// FOR LARAVEL 5.1 AND ABOVE
+// FOR LARAVEL 5.1 - 5.4
 BackupManager\Laravel\Laravel5ServiceProvider::class,
+
+// FOR LARAVEL 5.5
+BackupManager\Laravel\Laravel55ServiceProvider::class,
 ```
 
 Publish the storage configuration file.
