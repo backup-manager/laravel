@@ -36,6 +36,11 @@
   "extra": {
     "branch-alias": {
       "dev-master": "1.0-dev"
+    },
+    "laravel": {
+      "providers": [
+        "BackupManager\\Laravel\\Laravel55ServiceProvider"
+      ]
     }
   },
   "license": "MIT"
