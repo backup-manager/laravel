@@ -9,12 +9,13 @@ use Symfony\Component\Console\Exception\InvalidArgumentException;
  */
 trait Laravel55Compatibility {
     /**
-     * @param array $headers
-     * @param array $rows
-     * @internal param string $style
+     * @param $headers
+     * @param $rows
+     * @param string $style
+     * @param array $columnStyles
      * @return void
      */
-    public function table($headers, $rows, $style = 'default') {
+    public function table($headers, $rows, $style = 'default', array $columnStyles = []) {
         try {
             $table = $this->getHelperSet()->get('table');
         } catch (InvalidArgumentException $error) {
