@@ -51,6 +51,7 @@ class Laravel4ServiceProvider extends ServiceProvider {
             $provider->add(new Filesystems\Awss3Filesystem);
             $provider->add(new Filesystems\GcsFilesystem);
             $provider->add(new Filesystems\DropboxFilesystem);
+            $provider->add(new Filesystems\DropboxV2Filesystem);
             $provider->add(new Filesystems\FtpFilesystem);
             $provider->add(new Filesystems\LocalFilesystem);
             $provider->add(new Filesystems\RackspaceFilesystem);
