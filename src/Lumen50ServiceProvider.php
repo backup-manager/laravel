@@ -42,6 +42,7 @@ class Lumen50ServiceProvider extends ServiceProvider {
             $provider = new Filesystems\FilesystemProvider(new Config($app['config']['backup-manager']));
             $provider->add(new Filesystems\Awss3Filesystem);
             $provider->add(new Filesystems\DropboxFilesystem);
+            $provider->add(new Filesystems\DropboxV2Filesystem);
             $provider->add(new Filesystems\FtpFilesystem);
             $provider->add(new Filesystems\LocalFilesystem);
             $provider->add(new Filesystems\RackspaceFilesystem);
