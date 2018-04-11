@@ -7,10 +7,10 @@ return [
     ],
     's3' => [
         'type' => 'AwsS3',
-        'key'    => '',
-        'secret' => '',
-        'region' => 'us-east-1',
-        'bucket' => '',
+        'key'    => env('AWS_ACCESS_KEY_ID'),
+        'secret' => env('AWS_SECRET_ACCESS_KEY'),
+        'region' => env('AWS_DEFAULT_REGION'),
+        'bucket' => env('AWS_BUCKET'),
         'root'   => '',
     ],
     'gcs' => [
