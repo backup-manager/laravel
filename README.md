@@ -98,9 +98,13 @@ To install into a Lumen project, first do the composer install then add the conf
 $app->configure('backup-manager');
 $app->register(BackupManager\Laravel\Lumen50ServiceProvider::class);
 
-// FOR LUMEN 5.1 AND ABOVE
+// FOR LUMEN 5.1 - 5.4
 $app->configure('backup-manager');
 $app->register(BackupManager\Laravel\LumenServiceProvider::class);
+
+// FOR LUMEN 5.5 AND ABOVE
+$app->configure('backup-manager');
+$app->register(BackupManager\Laravel\Lumen55ServiceProvider::class);
 ```
 
 Copy the `vendor/backup-manager/laravel/config/backup-manager.php` file to `config/backup-manager.php` and configure it to suit your needs.
