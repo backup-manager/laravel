@@ -38,6 +38,8 @@ trait GetDatabaseConfig
                 'database' => $connection['database'],
                 'ignoreTables' => $connection['driver'] === 'mysql' && isset($connection['ignoreTables'])
                     ? $connection['ignoreTables'] : null,
+                // add additional options to dump-command (like '--max-allowed-packet')
+                'extraParams' => '--column-statistics=0',
             ];
         }, $connections);
         return new Config($mapped);
