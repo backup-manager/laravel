@@ -58,4 +58,7 @@ return [
         'privateKey' => '',
         'root' => '',
     ],
+
+    // Add additional options to dump-command (like '--max-allowed-packet')
+    'command-extra-params' => '',
 ];

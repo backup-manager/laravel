@@ -38,8 +38,7 @@ trait GetDatabaseConfig
                 'database' => $connection['database'],
                 'ignoreTables' => $connection['driver'] === 'mysql' && isset($connection['ignoreTables'])
                     ? $connection['ignoreTables'] : null,
-                // add additional options to dump-command (like '--max-allowed-packet')
-                'extraParams' => '',
+                'extraParams' => config('backup-manager.command-extra-params'),
             ];
         }, $connections);
         return new Config($mapped);
