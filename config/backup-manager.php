@@ -60,5 +60,5 @@ return [
     ],
 
     // Add additional options to dump-command (like '--max-allowed-packet')
-    'command-extra-params' => '',
+    'command-extra-params' => env('BACKUP_MANAGER_EXTRA_PARAMS'),
 ];
