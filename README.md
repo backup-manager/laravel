@@ -89,6 +89,12 @@ php artisan vendor:publish --provider="BackupManager\Laravel\Laravel5ServiceProv
 
 The Backup Manager will make use of Laravel's database configuration. But, it won't know about any connections that might be tied to other environments, so it can be best to just list multiple connections in the `config/database.php` file.
 
+We can also add extra parameters on our backup manager commands by configuring extra params on `.env` file:
+
+```
+BACKUP_MANAGER_EXTRA_PARAMS="--column-statistics=0 --max-allowed-packet"
+```
+
 #### Lumen Configuration
 
 To install into a Lumen project, first do the composer install then add the configuration file loader and *ONE* of the following service providers to your `bootstrap/app.php`.
