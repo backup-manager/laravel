@@ -1,4 +1,4 @@
-# Laravel Driver for the Database Backup Manager 1.3.1
+# Laravel Driver for the Database Backup Manager
 
 This package pulls in the framework agnostic [Backup Manager](https://github.com/backup-manager/backup-manager) and provides seamless integration with **Laravel**.
 
