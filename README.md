@@ -54,6 +54,9 @@ composer require league/flysystem-rackspace
 
 # to support sftp
 composer require league/flysystem-sftp
+
+# to support gcs
+composer require superbalist/flysystem-google-storage
 ```
 
 #### Laravel 4 Configuration
