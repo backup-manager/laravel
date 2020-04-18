@@ -15,10 +15,11 @@ return [
     ],
     'gcs' => [
         'type' => 'Gcs',
-        'key'    => '',
-        'secret' => '',
-        'bucket' => '',
-        'root'   => '',
+        'project' => env('GOOGLE_CLOUD_PROJECT_ID', 'your-project-id'),
+        'keyFilePath' => env('GOOGLE_CLOUD_KEY_FILE', null),
+        'bucket' => env('GOOGLE_CLOUD_STORAGE_BUCKET', 'your-bucket'),
+        'root' => '',
+        'prefix' => env('GOOGLE_CLOUD_STORAGE_PATH_PREFIX', null),
     ],
     'rackspace' => [
         'type' => 'Rackspace',
