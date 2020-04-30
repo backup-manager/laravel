@@ -14,8 +14,8 @@ This package pulls in the framework agnostic [Backup Manager](https://github.com
 - [Scheduling Backups](#scheduling-backups)
 - [Contribution Guidelines](#contribution-guidelines)
 - [Maintainers](#maintainers)
-- [Changelog](#changelog)
 - [License](#license)
+- [Changelog](#changelog)
 
 ### Stability Notice
 
@@ -146,16 +146,6 @@ It's possible to schedule backups using Laravel's scheduler.
  }
 ```
 
-### Changelog
-
-**2.0**
-
-_Released on 2020-04-30_
-
-Remove support for all Laravel versions below 5.5. All older versions should use the backup-manager `^1.0`.
-
-Since so many dependencies in Laravel / Symfony have changed it became impossible to support newer versions in the same code-base. Release `^1.0` is stable and is always accepting new stability fixes (we haven't seen anything to fix in a long time).
-
 ### Contribution Guidelines
 
 We recommend using the vagrant configuration supplied with this package for development and contribution. Simply install VirtualBox, Vagrant, and Ansible then run `vagrant up` in the root folder. A virtualmachine specifically designed for development of the package will be built and launched for you.
@@ -171,8 +161,18 @@ When contributing please consider the following guidelines:
 
 ### Maintainers
 
-This package is maintained by [Shawn McCool](http://shawnmc.cool) and [Mitchell van Wijngaarden](http://kooding.nl).
+This package is maintained by [Shawn McCool](http://shawnmc.cool) and [open-source heroes](https://github.com/backup-manager/laravel/pulls?q=is%3Apr+is%3Aclosed).
 
 ### License
 
 This package is licensed under the [MIT license](https://github.com/backup-manager/laravel/blob/master/LICENSE).
+
+### Changelog
+
+**2.0**
+
+_Released on 2020-04-30_
+
+Remove support for all Laravel versions below 5.5. All older versions should use the backup-manager `^1.0`.
+
+Since so many dependencies in Laravel / Symfony have changed it became impossible to support newer versions in the same code-base. Release `^1.0` is stable and is always accepting new stability fixes (we haven't seen anything to fix in a long time).
