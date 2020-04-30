@@ -14,18 +14,19 @@ This package pulls in the framework agnostic [Backup Manager](https://github.com
 - [Scheduling Backups](#scheduling-backups)
 - [Contribution Guidelines](#contribution-guidelines)
 - [Maintainers](#maintainers)
+- [Changelog](#changelog)
 - [License](#license)
 
 ### Stability Notice
 
 It's stable enough, you'll need to understand filesystem permissions.
 
-This package is actively being developed and we would like to get feedback to improve it. [Please feel free to submit feedback.](https://github.com/backup-manager/laravel/issues/new)
+This package is being actively developed, and we would like to get feedback to improve it. [Please feel free to submit feedback.](https://github.com/backup-manager/laravel/issues/new)
 
 ### Requirements
 
-- PHP 5.5
-- Laravel
+- PHP 7.3+
+- Laravel 5.5+
 - MySQL support requires `mysqldump` and `mysql` command-line binaries
 - PostgreSQL support requires `pg_dump` and `psql` command-line binaries
 - Gzip support requires `gzip` and `gunzip` command-line binaries
@@ -59,35 +60,19 @@ composer require league/flysystem-sftp
 composer require superbalist/flysystem-google-storage
 ```
 
-#### Laravel 4 Configuration
-
-To install into a Laravel 4 project, first do the composer install then add the following class to your config/app.php service providers list.
-
-```php
-BackupManager\Laravel\Laravel4ServiceProvider::class,
-```
-
-Copy the `vendor/backup-manager/laravel/config/backup-manager.php` file to `app/config/backup-manager.php` and configure it to suit your needs.
-
 #### Laravel 5 Configuration
 
 To install into a Laravel project, first do the composer install then add *ONE *of the following classes to your config/app.php service providers list.
 
 ```php
-// FOR LARAVEL 5.0 ONLY
-BackupManager\Laravel\Laravel50ServiceProvider::class,
-
-// FOR LARAVEL 5.1 - 5.4
-BackupManager\Laravel\Laravel5ServiceProvider::class,
-
-// FOR LARAVEL 5.5
+// FOR LARAVEL 5.5 +
 BackupManager\Laravel\Laravel55ServiceProvider::class,
 ```
 
 Publish the storage configuration file.
 
 ```php
-php artisan vendor:publish --provider="BackupManager\Laravel\Laravel5ServiceProvider"
+php artisan vendor:publish --provider="BackupManager\Laravel\Laravel55ServiceProvider"
 ```
 
 The Backup Manager will make use of Laravel's database configuration. But, it won't know about any connections that might be tied to other environments, so it can be best to just list multiple connections in the `config/database.php` file.
@@ -103,14 +88,6 @@ BACKUP_MANAGER_EXTRA_PARAMS="--column-statistics=0 --max-allowed-packet"
 To install into a Lumen project, first do the composer install then add the configuration file loader and *ONE* of the following service providers to your `bootstrap/app.php`.
 
 ```php
-// FOR LUMEN 5.0 ONLY
-$app->configure('backup-manager');
-$app->register(BackupManager\Laravel\Lumen50ServiceProvider::class);
-
-// FOR LUMEN 5.1 - 5.4
-$app->configure('backup-manager');
-$app->register(BackupManager\Laravel\LumenServiceProvider::class);
-
 // FOR LUMEN 5.5 AND ABOVE
 $app->configure('backup-manager');
 $app->register(BackupManager\Laravel\Lumen55ServiceProvider::class);
@@ -168,6 +145,16 @@ It's possible to schedule backups using Laravel's scheduler.
          )->twiceDaily(13,21);
  }
 ```
+
+### Changelog
+
+**2.0**
+
+_Released on 2020-04-30_
+
+Remove support for all Laravel versions below 5.5. All older versions should use the backup-manager `^1.0`.
+
+Since so many dependencies in Laravel / Symfony have changed it became impossible to support newer versions in the same code-base. Release `^1.0` is stable and is always accepting new stability fixes (we haven't seen anything to fix in a long time).
 
 ### Contribution Guidelines
 
