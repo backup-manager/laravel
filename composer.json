@@ -9,7 +9,7 @@
     }
   ],
   "require": {
-    "backup-manager/backup-manager": "^2.0",
+    "backup-manager/backup-manager": "^3.0",
     "php": "^7.3||^7.4",
     "symfony/process": "^3||^4||^5",
     "illuminate/support": "^5.5||^6||^7",
