@@ -43,7 +43,7 @@ class BackupManagerServiceProvider extends ServiceProvider
         $this->app->bind(FilesystemProvider::class, static function (Application $app): FilesystemProvider {
             $config = $app->make(Repository::class);
             $provider = new FilesystemProvider(RuntimeConfig::fromCallback(
-                static fn (): array => (array) $config->get('backup-manager', [])
+                static fn (): array => self::arrayValue($config->get('backup-manager'))
             ));
             $provider->add(new Awss3Filesystem());
             $provider->add(new AsyncAwsS3Filesystem());
@@ -61,7 +61,7 @@ class BackupManagerServiceProvider extends ServiceProvider
             $config = $app->make(Repository::class);
             $provider = new DatabaseProvider(RuntimeConfig::fromCallback(
                 static fn (): array => DatabaseConnections::map(
-                    (array) $config->get('database.connections', []),
+                    self::arrayValue($config->get('database.connections')),
                     $config->get('backup-manager.command-extra-params')
                 )
             ));
@@ -84,6 +84,14 @@ class BackupManagerServiceProvider extends ServiceProvider
             DbRestoreCommand::class,
             DbListCommand::class,
         ]);
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    private static function arrayValue(mixed $value): array
+    {
+        return is_array($value) ? $value : [];
     }
 
     public function boot(): void

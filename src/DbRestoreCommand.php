@@ -49,10 +49,10 @@ final class DbRestoreCommand extends Command
                 }
             } while (!$this->confirmed(sprintf(
                 'Do you want to restore the backup <comment>%s</comment> from <comment>%s</comment> to database <comment>%s</comment>, decompressing it with <comment>%s</comment>?',
-                $this->stringOption('sourcePath'),
-                $this->stringOption('source'),
-                $this->stringOption('database'),
-                $this->stringOption('compression')
+                (string) $this->stringOption('sourcePath'),
+                (string) $this->stringOption('source'),
+                (string) $this->stringOption('database'),
+                (string) $this->stringOption('compression')
             )));
         }
 
@@ -61,15 +61,15 @@ final class DbRestoreCommand extends Command
             (string) $this->stringOption('source'),
             (string) $this->stringOption('sourcePath'),
             (string) $this->stringOption('database'),
-            $this->stringOption('compression')
+            (string) $this->stringOption('compression')
         );
 
         $this->newLine();
         $this->info(sprintf(
             'Successfully restored <comment>%s</comment> from <comment>%s</comment> to database <comment>%s</comment>.',
-            $this->stringOption('sourcePath'),
-            $this->stringOption('source'),
-            $this->stringOption('database')
+            (string) $this->stringOption('sourcePath'),
+            (string) $this->stringOption('source'),
+            (string) $this->stringOption('database')
         ));
 
         return self::SUCCESS;

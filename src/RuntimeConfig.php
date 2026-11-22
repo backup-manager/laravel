@@ -20,8 +20,8 @@ use Closure;
  */
 final class RuntimeConfig extends Config
 {
-    /** @var Closure(): array<mixed> */
-    private Closure $entries;
+    /** @var (Closure(): array<mixed>)|null */
+    private ?Closure $entries = null;
 
     /**
      * @param Closure(): array<mixed> $entries returns connection configs keyed by connection name
@@ -62,7 +62,7 @@ final class RuntimeConfig extends Config
     public function getItems(): array
     {
         $entries = [];
-        foreach (($this->entries)() as $name => $entry) {
+        foreach ($this->entries === null ? [] : ($this->entries)() as $name => $entry) {
             if (is_array($entry)) {
                 /** @var array<string, mixed> $entry */
                 $entries[(string) $name] = $entry;

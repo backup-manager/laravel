@@ -47,10 +47,10 @@ final class DbBackupCommand extends Command
                 }
             } while (!$this->confirmed(sprintf(
                 'Do you want to create a backup of <comment>%s</comment>, store it on <comment>%s</comment> at <comment>%s</comment> and compress it with <comment>%s</comment>?',
-                $this->stringOption('database'),
-                $this->stringOption('destination'),
+                (string) $this->stringOption('database'),
+                (string) $this->stringOption('destination'),
                 $this->destinationPath(),
-                $this->stringOption('compression')
+                (string) $this->stringOption('compression')
             )));
         }
 
@@ -62,8 +62,8 @@ final class DbBackupCommand extends Command
         $this->newLine();
         $this->info(sprintf(
             'Successfully dumped <comment>%s</comment>, compressed with <comment>%s</comment> and stored it on <comment>%s</comment> at <comment>%s</comment>',
-            $this->stringOption('database'),
-            $this->stringOption('compression'),
+            (string) $this->stringOption('database'),
+            (string) $this->stringOption('compression'),
             $destination->destinationFilesystem(),
             $destination->destinationPath()
         ));

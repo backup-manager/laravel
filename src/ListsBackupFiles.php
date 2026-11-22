@@ -33,12 +33,17 @@ trait ListsBackupFiles
     private function renderBackupFiles(array $files): void
     {
         $this->table(['Name', 'Extension', 'Size', 'Created'], array_map(
-            static fn (FileAttributes $file): array => [
-                basename($file->path()),
-                pathinfo($file->path(), PATHINFO_EXTENSION),
-                $file->fileSize() === null ? '' : self::formatBytes($file->fileSize()),
-                $file->lastModified() === null ? '' : date('D j Y  H:i:s', $file->lastModified()),
-            ],
+            static function (FileAttributes $file): array {
+                $size = $file->fileSize();
+                $modified = $file->lastModified();
+
+                return [
+                    basename($file->path()),
+                    pathinfo($file->path(), PATHINFO_EXTENSION),
+                    $size === null ? '' : self::formatBytes($size),
+                    $modified === null ? '' : date('D j Y  H:i:s', $modified),
+                ];
+            },
             $files
         ));
     }
@@ -46,9 +51,14 @@ trait ListsBackupFiles
     private static function formatBytes(int $bytes): string
     {
         $units = ['B', 'KB', 'MB', 'GB', 'TB'];
-        $power = $bytes > 0 ? min((int) floor(log($bytes, 1024)), count($units) - 1) : 0;
+        $value = (float) max($bytes, 0);
+        $power = 0;
+        while ($value >= 1024 && $power < count($units) - 1) {
+            $value /= 1024;
+            $power++;
+        }
 
-        return round($bytes / (1024 ** $power), 2) . ' ' . $units[$power];
+        return (string) round($value, 2) . ' ' . $units[$power];
     }
 
     private static function joinPath(string $directory, string $filename): string
