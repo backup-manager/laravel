@@ -35,6 +35,9 @@ class MysqlBackupAndRestoreTest extends TestCase
         ];
         $app['config']->set('database.connections.tcp', $base + ['host' => '127.0.0.1', 'port' => '3306']);
         $app['config']->set('database.connections.socket', $base + [
+            // Unreachable (TEST-NET-1): passes only if the socket replaces host and port.
+            'host' => '192.0.2.1',
+            'port' => '3306',
             'unix_socket' => getenv('BACKUP_MANAGER_TEST_MYSQL_SOCKET') ?: '/var/run/mysqld/mysqld.sock',
         ]);
     }

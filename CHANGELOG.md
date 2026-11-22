@@ -22,9 +22,15 @@ adheres to [Semantic Versioning](https://semver.org/).
   including a MySQL backup and restore over TCP and a unix socket.
 
 ### Changed
-- Requires `backup-manager/backup-manager` ^3.3 (Flysystem 1, 2 or 3) and PHP
-  7.4+. `symfony/process` requires a release patched for CVE-2024-51736 and
-  CVE-2026-24739.
+- Requires `backup-manager/backup-manager` ^3.3 (Flysystem 1, 2 or 3), PHP
+  7.4+ and Laravel 7+. `symfony/process` requires a release patched for
+  CVE-2024-51736 and CVE-2026-24739, which Laravel 5.5–6 cannot install;
+  Laravel 5.5–6 and PHP 7.3 stay on 2.0.
+- A MySQL connection that sets both `host` and `unix_socket` (for example
+  `DB_SOCKET` in Laravel's default config) is backed up through the socket,
+  as Laravel itself connects; 2.0 used host and port.
+- A read/write connection without a top-level `host` is backed up from its
+  `write` host (2.0 failed with "Undefined index: host").
 - Configuration is read when a backup runs, so storage and database
   connections changed at runtime (`config([...])`, `Config::set()`) are used,
   also by `Artisan::call()` and by an injected `Manager`. (#78, #82, #115)

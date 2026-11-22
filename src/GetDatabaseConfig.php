@@ -52,6 +52,10 @@ trait GetDatabaseConfig
         }
 
         $host = isset($connection['host']) ? $connection['host'] : null;
+        if ($host === null && isset($connection['write']['host'])) {
+            // Read/write split: back up from the write (primary) connection.
+            $host = $connection['write']['host'];
+        }
         if (is_array($host)) {
             $host = reset($host);
         }

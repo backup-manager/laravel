@@ -4,6 +4,7 @@ namespace BackupManager\Laravel\Tests;
 
 use BackupManager\Compressors\CompressorProvider;
 use BackupManager\Filesystems\FilesystemProvider;
+use BackupManager\Filesystems\FilesystemTypeNotSupported;
 use BackupManager\Manager;
 use BackupManager\ShellProcessing\ShellProcessor;
 use Illuminate\Support\Facades\Artisan;
@@ -43,5 +44,21 @@ class ServiceProviderTest extends TestCase
 
         $this->assertSame($this->storageRoot . '/tenant', $filesystems->getConfig('tenant', 'root'));
         $this->assertNotNull($filesystems->get('tenant'));
+    }
+
+    public function test_it_registers_every_core_storage_type()
+    {
+        $types = ['AwsS3', 'AsyncAwsS3', 'Gcs', 'Dropbox', 'Ftp', 'Local', 'Sftp', 'Webdav'];
+        foreach ($types as $type) {
+            config(["backup-manager.probe" => ['type' => $type, 'root' => $this->storageRoot]]);
+            try {
+                $this->app->make(FilesystemProvider::class)->get('probe');
+            } catch (FilesystemTypeNotSupported $notRegistered) {
+                $this->fail("{$type} is not registered: " . $notRegistered->getMessage());
+            } catch (\Throwable $adapterMissingOrConfig) {
+                // Registered; building it needs the adapter package and settings.
+            }
+        }
+        $this->addToAssertionCount(count($types));
     }
 }

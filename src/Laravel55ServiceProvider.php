@@ -52,6 +52,7 @@ class Laravel55ServiceProvider extends ServiceProvider {
                 return $app['config']['backup-manager'] ?: [];
             }));
             $provider->add(new Filesystems\Awss3Filesystem);
+            $provider->add(new Filesystems\AsyncAwsS3Filesystem);
             $provider->add(new Filesystems\GcsFilesystem);
             $provider->add(new Filesystems\DropboxFilesystem);
             $provider->add(new Filesystems\DropboxV2Filesystem);
@@ -59,6 +60,7 @@ class Laravel55ServiceProvider extends ServiceProvider {
             $provider->add(new Filesystems\LocalFilesystem);
             $provider->add(new Filesystems\RackspaceFilesystem);
             $provider->add(new Filesystems\SftpFilesystem);
+            $provider->add(new Filesystems\WebdavFilesystem);
             return $provider;
         });
     }

@@ -100,4 +100,15 @@ class DatabaseConfigTest extends TestCase
 
         $this->assertStringContainsString("'tenant_42'", $databases->get('tenant')->getDumpCommandLine('out.sql'));
     }
+
+    public function test_a_read_write_connection_is_backed_up_from_the_write_host()
+    {
+        config(['database.connections.app' => $this->mysqlConnection([
+            'host' => null,
+            'read' => ['host' => ['replica.example']],
+            'write' => ['host' => ['primary.example']],
+        ])]);
+
+        $this->assertStringContainsString("--host='primary.example'", $this->dumpCommandFor('app'));
+    }
 }
