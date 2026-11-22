@@ -6,11 +6,13 @@ adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [2.1.0] - 2026-11-22
+
 ### Added
 - Laravel 8, 9, 10, 11, 12 and 13 support, and PHP 8. (reimplements #130 by
   @nafiesl and #135 by @martindrapeau)
 - MySQL connections through `unix_socket` (no `host` needed). (#128 by
-  @brucek2; needs backup-manager 3.3)
+  @brucek2; uses backup-manager 3.3)
 - MySQL backup options set on the Laravel connection in
   `config/database.php`: `singleTransaction`, `ignoreTables`, `onlyTables`,
   `ssl`, `columnStatistics` and `extraParams`. (#116, #101, #99)

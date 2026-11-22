@@ -13,10 +13,6 @@ concurrency:
 permissions:
   contents: read
 
-env:
-  # Until backup-manager/backup-manager 3.3.0 is tagged, test against its branch.
-  CORE_CONSTRAINT: 'dev-campaign/3.3-socket as 3.3.0'
-
 jobs:
   phpunit:
     name: Laravel ${{ matrix.laravel }}, PHP ${{ matrix.php }}
@@ -65,9 +61,6 @@ jobs:
 
       - name: Select Laravel ${{ matrix.laravel }}
         run: |
-          composer config minimum-stability dev
-          composer config prefer-stable true
-          composer require --no-update "backup-manager/backup-manager:${CORE_CONSTRAINT}"
           composer require --no-update "illuminate/support:^${{ matrix.laravel }}.0"
           composer require --no-update --dev "orchestra/testbench:${{ matrix.testbench }}"
 
@@ -98,12 +91,6 @@ jobs:
 
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-
-      - name: Use the unreleased core
-        run: |
-          composer config minimum-stability dev
-          composer config prefer-stable true
-          composer require --no-update "backup-manager/backup-manager:${CORE_CONSTRAINT}"
 
       - name: Download dependencies
         uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0
