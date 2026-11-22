@@ -19,7 +19,8 @@ Requires PHP 8.2, Laravel 12 or 13, and backup-manager 4.1. See
   `DbBackupCommand`, `DbRestoreCommand` and `DbListCommand` replace the
   `Laravel55*` command classes; the old names remain as deprecated aliases.
 - Commands are final, receive their services in `handle()`, and fail with a
-  "Missing options" error instead of prompting in non-interactive runs.
+  "Missing options" error instead of prompting when there is no terminal
+  (scheduler, queued `Artisan::call()`, `--no-interaction`).
 - `db:list` without `--path` lists the storage root.
 - Native types and `strict_types`; PHPStan level 8 and Psalm level 2 in CI.
 

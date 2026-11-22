@@ -53,7 +53,7 @@
         },
         "laravel": {
             "providers": [
-                "BackupManager\\Laravel\\Laravel55ServiceProvider"
+                "BackupManager\\Laravel\\BackupManagerServiceProvider"
             ]
         }
     }

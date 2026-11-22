@@ -20,6 +20,7 @@
 | `DropboxV2` storage type | `Dropbox` type with `spatie/flysystem-dropbox` (`token`, `root`) |
 | `Rackspace` storage type and the default `rackspace` connection | `AwsS3` type with an S3-compatible service |
 | traits `AutoComplete`, `Laravel55Compatibility`, `GetDatabaseConfig` | none; they were internal helpers of the commands and providers |
+| trait `ListsBackupFiles` as 2.1 shipped it (`backupFileRows()`, array rows from `listBackupFiles()`) | none; it is now `@internal`, returns Flysystem `FileAttributes`, and may change without notice |
 
 ### Renamed
 
@@ -31,10 +32,13 @@
 | `Laravel55DbListCommand` | `DbListCommand` |
 
 The `Laravel55*` names still work as deprecated aliases and are removed in
-4.0. Package discovery registers the new provider; if you list the provider
-in `config/app.php` or `bootstrap/providers.php`, change it to
-`BackupManager\Laravel\BackupManagerServiceProvider`, and the vendor:publish
-command to `--provider="BackupManager\Laravel\BackupManagerServiceProvider"`.
+4.0. Package discovery registers the new provider. If you also list the
+provider in `config/app.php` or `bootstrap/providers.php`, remove that entry
+(or change it to `BackupManager\Laravel\BackupManagerServiceProvider`):
+Laravel tracks providers by their real class name, so the old name next to
+discovery registers the provider twice. Use
+`--provider="BackupManager\Laravel\BackupManagerServiceProvider"` with
+`vendor:publish`.
 
 ### Commands
 
@@ -42,12 +46,18 @@ command to `--provider="BackupManager\Laravel\BackupManagerServiceProvider"`.
 - The command classes are `final` and receive their services in `handle()`;
   the constructors that took `BackupProcedure`, `RestoreProcedure`,
   `DatabaseProvider` and `FilesystemProvider` are gone, as is `fire()`.
-- In a non-interactive run (`--no-interaction`, the scheduler) a missing
-  required option is an error with exit code 1 instead of a prompt.
 - `db:list` without `--path` lists the storage root instead of asking for a
   path.
 - Choices (connections, compression, backup file) are asked with Laravel's
-  `choice()` prompt.
+  `choice()` prompt, and the question texts changed (e.g. "From which
+  database connection do you want to dump?", "Are these correct?"; the
+  compression choices are `gzip`, `null`). Tests that assert the 2.x wording
+  with `expectsQuestion()` need updating. The confirmation still defaults to
+  no.
+- Without a terminal (`--no-interaction`, the scheduler, `Artisan::call()`
+  from a queued job), a missing required option is an error with exit code 1
+  instead of a prompt.
+- An empty answer to "How do you want to name the backup?" is asked again.
 
 ### Extending
 

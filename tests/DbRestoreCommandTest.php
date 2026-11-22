@@ -27,6 +27,25 @@ class DbRestoreCommandTest extends TestCase
             ->assertSuccessful();
     }
 
+    public function test_declining_the_confirmation_asks_again(): void
+    {
+        mkdir($this->storageRoot . '/backups');
+        file_put_contents($this->storageRoot . '/backups/only.sql.gz', 'x');
+
+        $restore = Mockery::mock(RestoreProcedure::class);
+        $restore->shouldReceive('run')->once()->with('local', 'backups/only.sql.gz', 'mysql', 'gzip');
+        $this->app->instance(RestoreProcedure::class, $restore);
+
+        $this->artisan('db:restore', ['--source' => 'local', '--database' => 'mysql', '--compression' => 'gzip'])
+            ->expectsQuestion('From which directory do you want to restore?', 'backups')
+            ->expectsChoice('Which database dump do you want to restore?', 'only.sql.gz', ['only.sql.gz'])
+            ->expectsConfirmation('Are these correct?', 'no')
+            ->expectsQuestion('From which directory do you want to restore?', 'backups')
+            ->expectsChoice('Which database dump do you want to restore?', 'only.sql.gz', ['only.sql.gz'])
+            ->expectsConfirmation('Are these correct?', 'yes')
+            ->assertSuccessful();
+    }
+
     public function test_it_reports_an_empty_directory(): void
     {
         $this->artisan('db:restore', ['--source' => 'local', '--database' => 'mysql', '--compression' => 'gzip'])

@@ -27,8 +27,12 @@ final class DbBackupCommand extends Command
     /** @var string */
     protected $description = 'Create database dump and save it on a service';
 
+    /** The --timestamp suffix, computed once so the confirmed path is the path written. */
+    private string $timestamp = '';
+
     public function handle(BackupProcedure $backup, DatabaseProvider $databases, FilesystemProvider $filesystems): int
     {
+        $this->timestamp = date((string) $this->stringOption('timestamp'));
         $missing = $this->missingOptions(['database', 'destination', 'destinationPath', 'compression']);
         if ($this->refuseToPrompt($missing)) {
             return self::FAILURE;
@@ -73,6 +77,6 @@ final class DbBackupCommand extends Command
 
     private function destinationPath(): string
     {
-        return $this->stringOption('destinationPath') . date((string) $this->stringOption('timestamp'));
+        return $this->stringOption('destinationPath') . $this->timestamp;
     }
 }

@@ -28,14 +28,28 @@ trait PromptsForOptions
     }
 
     /**
-     * In a non-interactive run (scheduler, --no-interaction) missing options
-     * are an error instead of a prompt.
+     * Laravel's own rule (ConfiguresPrompts): prompts need an interactive
+     * input on a terminal. Symfony Console only turns interactivity off for
+     * --no-interaction, so the scheduler and queued Artisan::call() runs
+     * would otherwise prompt and abort.
+     */
+    private function canPrompt(): bool
+    {
+        if (!$this->input->isInteractive()) {
+            return false;
+        }
+
+        return (defined('STDIN') && stream_isatty(STDIN)) || $this->laravel->runningUnitTests();
+    }
+
+    /**
+     * Without a terminal, missing options are an error instead of a prompt.
      *
      * @param list<string> $missing
      */
     private function refuseToPrompt(array $missing): bool
     {
-        if ($missing === [] || $this->input->isInteractive()) {
+        if ($missing === [] || $this->canPrompt()) {
             return false;
         }
         $this->error('Missing options: --' . implode(', --', $missing));
@@ -56,8 +70,10 @@ trait PromptsForOptions
 
     private function askText(string $option, string $question): bool
     {
-        $answer = $this->ask($question);
-        $this->input->setOption($option, is_string($answer) ? $answer : '');
+        do {
+            $answer = $this->ask($question);
+        } while (!is_string($answer) || trim($answer) === '');
+        $this->input->setOption($option, $answer);
 
         return true;
     }
@@ -68,6 +84,7 @@ trait PromptsForOptions
         $this->info($summary);
         $this->newLine();
 
-        return $this->confirm('Are these correct?', true);
+        // Defaults to no, as in 2.x: Enter re-asks instead of running a restore.
+        return $this->confirm('Are these correct?', false);
     }
 }
