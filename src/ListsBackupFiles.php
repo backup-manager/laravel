@@ -50,15 +50,15 @@ trait ListsBackupFiles
 
     private static function formatBytes(int $bytes): string
     {
-        $units = ['B', 'KB', 'MB', 'GB', 'TB'];
         $value = (float) max($bytes, 0);
-        $power = 0;
-        while ($value >= 1024 && $power < count($units) - 1) {
-            $value /= 1024;
-            $power++;
+        foreach (['B', 'KB', 'MB', 'GB'] as $unit) {
+            if ($value < 1024.0) {
+                return (string) round($value, 2) . ' ' . $unit;
+            }
+            $value /= 1024.0;
         }
 
-        return (string) round($value, 2) . ' ' . $units[$power];
+        return (string) round($value, 2) . ' TB';
     }
 
     private static function joinPath(string $directory, string $filename): string
