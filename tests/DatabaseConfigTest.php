@@ -139,4 +139,28 @@ class DatabaseConfigTest extends TestCase
         $this->assertStringContainsString("--port='5433'", $command);
         $this->assertStringContainsString("'shop'", $command);
     }
+
+    public function test_the_url_host_and_port_replace_the_connection_s()
+    {
+        config(['database.connections.app' => [
+            'driver' => 'mysql',
+            'url' => 'mysql://user:secret@db.example:3307/shop',
+            'host' => '127.0.0.1',
+            'port' => '3306',
+        ]]);
+
+        $command = $this->dumpCommandFor('app');
+
+        $this->assertStringContainsString("--host='db.example' --port='3307'", $command);
+        $this->assertStringNotContainsString('127.0.0.1', $command);
+    }
+
+    public function test_an_empty_or_null_url_is_ignored()
+    {
+        foreach (['', null] as $url) {
+            config(['database.connections.app' => $this->mysqlConnection(['url' => $url])]);
+
+            $this->assertStringContainsString("--host='db.example'", $this->dumpCommandFor('app'));
+        }
+    }
 }
