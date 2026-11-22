@@ -1,6 +1,7 @@
 <?php namespace BackupManager\Laravel;
 
 use BackupManager\Config\Config;
+use Illuminate\Support\ConfigurationUrlParser;
 
 /**
  * Maps Laravel database connections to backup-manager database configs.
@@ -42,6 +43,11 @@ trait GetDatabaseConfig
      * @return array
      */
     private function mapDatabaseConnection(array $connection) {
+        if (isset($connection['url']) && is_string($connection['url']) && $connection['url'] !== '') {
+            // DB_URL: Laravel's own parser; URL parts override the connection's keys, as Laravel connects.
+            $connection = (new ConfigurationUrlParser())->parseConfiguration($connection);
+        }
+
         $driver = isset($connection['driver']) ? $connection['driver'] : null;
         // Laravel 11+ has a mariadb driver; mysqldump and mysql handle MariaDB.
         $type = $driver === 'mariadb' ? 'mysql' : $driver;

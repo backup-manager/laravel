@@ -111,4 +111,56 @@ class DatabaseConfigTest extends TestCase
 
         $this->assertStringContainsString("--host='primary.example'", $this->dumpCommandFor('app'));
     }
+
+    public function test_a_connection_url_is_used()
+    {
+        config(['database.connections.app' => [
+            'driver' => 'mysql',
+            'url' => 'mysql://user:p%40ss@db.example:3307/shop?unix_socket=/run/mysqld/mysqld.sock',
+            'host' => '127.0.0.1',
+            'database' => 'forge',
+        ]]);
+
+        $command = $this->dumpCommandFor('app');
+
+        $this->assertStringContainsString("--socket='/run/mysqld/mysqld.sock'", $command);
+        $this->assertStringContainsString("--user='user'", $command);
+        $this->assertStringContainsString("--password='p@ss'", $command);
+        $this->assertStringContainsString("'shop'", $command);
+    }
+
+    public function test_a_postgres_url_selects_the_postgresql_database()
+    {
+        config(['database.connections.app' => ['driver' => 'pgsql', 'url' => 'postgres://user:secret@pg.example:5433/shop']]);
+
+        $command = $this->dumpCommandFor('app');
+
+        $this->assertStringContainsString("--host='pg.example'", $command);
+        $this->assertStringContainsString("--port='5433'", $command);
+        $this->assertStringContainsString("'shop'", $command);
+    }
+
+    public function test_the_url_host_and_port_replace_the_connection_s()
+    {
+        config(['database.connections.app' => [
+            'driver' => 'mysql',
+            'url' => 'mysql://user:secret@db.example:3307/shop',
+            'host' => '127.0.0.1',
+            'port' => '3306',
+        ]]);
+
+        $command = $this->dumpCommandFor('app');
+
+        $this->assertStringContainsString("--host='db.example' --port='3307'", $command);
+        $this->assertStringNotContainsString('127.0.0.1', $command);
+    }
+
+    public function test_an_empty_or_null_url_is_ignored()
+    {
+        foreach (['', null] as $url) {
+            config(['database.connections.app' => $this->mysqlConnection(['url' => $url])]);
+
+            $this->assertStringContainsString("--host='db.example'", $this->dumpCommandFor('app'));
+        }
+    }
 }
