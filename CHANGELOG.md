@@ -6,7 +6,7 @@ adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
-## [3.0.0] - unreleased
+## [3.0.0] - 2026-11-22
 
 Requires PHP 8.2, Laravel 12 or 13, and backup-manager 4.1. See
 [UPGRADE.md](UPGRADE.md).
