@@ -87,7 +87,7 @@ class DbBackupCommand extends Command {
      * @return mixed
      */
     public function fire() {
-        $this->timestamp = date($this->option('timestamp'));
+        $this->timestamp = date((string) $this->option('timestamp'));
 
         if ($this->isMissingArguments()) {
             $this->displayMissingArguments();

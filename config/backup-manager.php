@@ -12,6 +12,9 @@ return [
         'region' => env('AWS_DEFAULT_REGION'),
         'bucket' => env('AWS_BUCKET'),
         'root'   => '',
+        // S3-compatible services (DigitalOcean Spaces, MinIO, ...):
+        // 'endpoint' => env('AWS_ENDPOINT'),
+        // 'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
     ],
     'gcs' => [
         'type' => 'Gcs',
@@ -31,11 +34,8 @@ return [
         'root' => '',
     ],
     'dropbox' => [
-        'type' => 'DropboxV2',
+        'type' => 'Dropbox',
         'token' => '',
-        'key' => '',
-        'secret' => '',
-        'app' => '',
         'root' => '',
     ],
     'ftp' => [
@@ -54,7 +54,7 @@ return [
         'host' => '',
         'username' => '',
         'password' => '',
-        'port' => 21,
+        'port' => 22,
         'timeout' => 10,
         'privateKey' => '',
         'root' => '',

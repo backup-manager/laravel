@@ -40,7 +40,7 @@ trait AutoComplete {
      * @param null $default
      * @return mixed
      */
-    protected function useSymfontDialog($dialog, array $list, $default = null, $validation) {
+    protected function useSymfontDialog($dialog, array $list, $default, $validation) {
         $helper = $this->getHelperSet()->get('dialog');
 
         return $helper->askAndValidate(
@@ -53,7 +53,7 @@ trait AutoComplete {
      * @param null $default
      * @return mixed
      */
-    protected function useSymfonyQuestion($dialog, $default = null, $validation) {
+    protected function useSymfonyQuestion($dialog, $default, $validation) {
         $question = new Question($dialog . ' ', $default);
         $question->setValidator($validation);
         $helper = $this->getHelper('question');

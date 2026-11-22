@@ -12,6 +12,7 @@ use BackupManager\Filesystems\FilesystemProvider;
  */
 class DbRestoreCommand extends Command {
     use AutoComplete;
+    use ListsBackupFiles;
 
     /**
      * The console command name.
@@ -157,34 +158,19 @@ class DbRestoreCommand extends Command {
 
         // ask file
         $filesystem = $this->filesystems->get($this->option('source'));
-        $contents = $filesystem->listContents($path);
+        $listed = $this->listBackupFiles($filesystem, $path);
 
-        $files = [];
-
-        foreach ($contents as $file) {
-            if ($file['type'] == 'dir') continue;
-            $files[] = $file['basename'];
-        }
-
-        if (empty($files)) {
+        if (empty($listed)) {
             $this->info('No backups were found at this path.');
             return;
         }
 
-        $rows = [];
-        foreach ($contents as $file) {
-            if ($file['type'] == 'dir') continue;
-            $rows[] = [
-                $file['basename'],
-                key_exists('extension', $file) ? $file['extension'] : null,
-                $this->formatBytes($file['size']),
-                date('D j Y  H:i:s', $file['timestamp'])
-            ];
-        }
+        $files = array_column($listed, 'name');
+        $rows = $this->backupFileRows($listed);
         $this->info('Available database dumps:');
         $this->table(['Name', 'Extension', 'Size', 'Created'], $rows);
         $filename = $this->autocomplete("Which database dump do you want to restore?", $files);
-        $this->input->setOption('sourcePath', "{$path}/{$filename}");
+        $this->input->setOption('sourcePath', $this->joinPath($path, $filename));
     }
 
     /**
@@ -264,6 +250,6 @@ class DbRestoreCommand extends Command {
         $bytes = max($bytes, 0);
         $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
         $pow = min($pow, count($units) - 1);
-        return round($bytes, $precision) . ' ' . $units[$pow];
+        return round($bytes / pow(1024, $pow), $precision) . ' ' . $units[$pow];
     }
 }

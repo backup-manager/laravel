@@ -5,7 +5,6 @@ use BackupManager\Filesystems;
 use BackupManager\Compressors;
 use Symfony\Component\Process\Process;
 use Illuminate\Support\ServiceProvider;
-use BackupManager\Config\Config;
 use BackupManager\ShellProcessing\ShellProcessor;
 
 /**
@@ -49,7 +48,9 @@ class Laravel55ServiceProvider extends ServiceProvider {
      */
     private function registerFilesystemProvider() {
         $this->app->bind(\BackupManager\Filesystems\FilesystemProvider::class, function ($app) {
-            $provider = new Filesystems\FilesystemProvider(new Config($app['config']['backup-manager']));
+            $provider = new Filesystems\FilesystemProvider(new RuntimeConfig(function () use ($app) {
+                return $app['config']['backup-manager'] ?: [];
+            }));
             $provider->add(new Filesystems\Awss3Filesystem);
             $provider->add(new Filesystems\GcsFilesystem);
             $provider->add(new Filesystems\DropboxFilesystem);
@@ -69,7 +70,9 @@ class Laravel55ServiceProvider extends ServiceProvider {
      */
     private function registerDatabaseProvider() {
         $this->app->bind(\BackupManager\Databases\DatabaseProvider::class, function ($app) {
-            $provider = new Databases\DatabaseProvider($this->getDatabaseConfig($app['config']['database.connections']));
+            $provider = new Databases\DatabaseProvider(new RuntimeConfig(function () use ($app) {
+                return $this->mapDatabaseConnections($app['config']['database.connections'] ?: []);
+            }));
             $provider->add(new Databases\MysqlDatabase);
             $provider->add(new Databases\PostgresqlDatabase);
             return $provider;
@@ -123,6 +126,7 @@ class Laravel55ServiceProvider extends ServiceProvider {
         return [
             \BackupManager\Filesystems\FilesystemProvider::class,
             \BackupManager\Databases\DatabaseProvider::class,
+            \BackupManager\Compressors\CompressorProvider::class,
             \BackupManager\ShellProcessing\ShellProcessor::class,
         ];
     }

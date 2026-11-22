@@ -1,42 +1,56 @@
 {
-  "name": "backup-manager/laravel",
-  "description": "Database backup manager seamlessly integrated with Laravel 4 or 5 with user-definable procedures and support for S3, Dropbox, FTP, SFTP, and more.",
-  "authors": [
-    {
-      "name": "Shawn McCool",
-      "email": "shawn@heybigname.com",
-      "homepage": "https://shawnmc.cool"
-    }
-  ],
-  "require": {
-    "backup-manager/backup-manager": "^3.0",
-    "php": "^7.3||^7.4",
-    "symfony/process": "^3||^4||^5",
-    "illuminate/support": "^5.5||^6||^7",
-    "illuminate/container": "^5.5||^6||^7",
-    "illuminate/console": "^5.5||^6||^7"
-  },
-  "require-dev": {
-    "mockery/mockery": "dev-master",
-    "satooshi/php-coveralls": "~0.6"
-  },
-  "config": {
-    "bin-dir": "bin"
-  },
-  "autoload": {
-    "psr-4": {
-      "BackupManager\\Laravel\\": "src/"
-    }
-  },
-  "extra": {
-    "branch-alias": {
-      "dev-master": "1.0-dev"
+    "name": "backup-manager/laravel",
+    "description": "Database backup manager integrated with Laravel: back up and restore MySQL and PostgreSQL to S3, Google Cloud Storage, Dropbox, FTP, SFTP, WebDAV and more.",
+    "license": "MIT",
+    "keywords": [
+        "laravel",
+        "backup",
+        "database",
+        "mysql",
+        "postgresql",
+        "s3",
+        "flysystem"
+    ],
+    "authors": [
+        {
+            "name": "Shawn McCool",
+            "email": "shawn@heybigname.com",
+            "homepage": "https://shawnmc.cool"
+        }
+    ],
+    "require": {
+        "php": "^7.4 || ^8.0",
+        "backup-manager/backup-manager": "^3.3",
+        "illuminate/console": "^5.5 || ^6.0 || ^7.0 || ^8.0 || ^9.0 || ^10.0 || ^11.0 || ^12.0 || ^13.0",
+        "illuminate/container": "^5.5 || ^6.0 || ^7.0 || ^8.0 || ^9.0 || ^10.0 || ^11.0 || ^12.0 || ^13.0",
+        "illuminate/support": "^5.5 || ^6.0 || ^7.0 || ^8.0 || ^9.0 || ^10.0 || ^11.0 || ^12.0 || ^13.0",
+        "symfony/process": "^5.4.51 || ^6.4.33 || ^7.4.5 || ^8.0.5"
     },
-    "laravel": {
-      "providers": [
-        "BackupManager\\Laravel\\Laravel55ServiceProvider"
-      ]
+    "require-dev": {
+        "orchestra/testbench": "^5.20 || ^6.48 || ^7.58 || ^8.39 || ^9.18 || ^10.0 || ^11.0",
+        "phpunit/phpunit": "^8.5.21 || ^9.5.10 || ^10.5.35 || ^11.5.50 || ^12.5.8"
+    },
+    "autoload": {
+        "psr-4": {
+            "BackupManager\\Laravel\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "BackupManager\\Laravel\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.x-dev"
+        },
+        "laravel": {
+            "providers": [
+                "BackupManager\\Laravel\\Laravel55ServiceProvider"
+            ]
+        }
     }
-  },
-  "license": "MIT"
 }
