@@ -24,15 +24,6 @@ return [
         'root' => '',
         'prefix' => env('GOOGLE_CLOUD_STORAGE_PATH_PREFIX', null),
     ],
-    'rackspace' => [
-        'type' => 'Rackspace',
-        'username' => '',
-        'key' => '',
-        'container' => '',
-        'zone' => '',
-        'endpoint' => 'https://identity.api.rackspacecloud.com/v2.0/',
-        'root' => '',
-    ],
     'dropbox' => [
         'type' => 'Dropbox',
         'token' => '',

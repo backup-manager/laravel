@@ -1,11 +1,16 @@
-<?php namespace BackupManager\Laravel;
+<?php
 
-use Illuminate\Console\Command;
+declare(strict_types=1);
 
-/**
- * Class Laravel5DbBackupCommand
- * @package BackupManager\Laravel
- */
-class Laravel55DbBackupCommand extends DbBackupCommand {
-    use Laravel55Compatibility;
+namespace BackupManager\Laravel;
+
+class_alias(DbBackupCommand::class, Laravel55DbBackupCommand::class);
+
+if (false) {
+    /**
+     * @deprecated since 3.0, use {@see DbBackupCommand}; removed in 4.0.
+     */
+    class Laravel55DbBackupCommand extends DbBackupCommand
+    {
+    }
 }

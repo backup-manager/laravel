@@ -1,66 +1,70 @@
-<?php namespace BackupManager\Laravel;
+<?php
+
+declare(strict_types=1);
+
+namespace BackupManager\Laravel;
+
+use League\Flysystem\FileAttributes;
+use League\Flysystem\FilesystemOperator;
 
 /**
- * Lists the files in a directory of a Flysystem instance of any major version.
- *
- * Flysystem 1 returns arrays with basename/size/timestamp keys; Flysystem 2
- * and 3 return StorageAttributes objects.
- *
- * @package BackupManager\Laravel
+ * @internal
  */
-trait ListsBackupFiles {
+trait ListsBackupFiles
+{
     /**
-     * @param \League\Flysystem\FilesystemInterface|\League\Flysystem\FilesystemOperator $filesystem
-     * @param string|null $path
-     * @return array[] each with name, extension, size (bytes or null) and timestamp (or null)
+     * @return list<FileAttributes> the files (not directories) directly in $directory
      */
-    private function listBackupFiles($filesystem, $path) {
+    private function listBackupFiles(FilesystemOperator $filesystem, string $directory): array
+    {
         $files = [];
-        foreach ($filesystem->listContents((string) $path) as $item) {
-            if ($item instanceof \League\Flysystem\StorageAttributes) {
-                if ( ! $item->isFile()) continue;
-                $name = basename($item->path());
-                $files[] = [
-                    'name' => $name,
-                    'extension' => pathinfo($name, PATHINFO_EXTENSION) ?: null,
-                    'size' => $item->fileSize(),
-                    'timestamp' => $item->lastModified(),
-                ];
-                continue;
+        foreach ($filesystem->listContents($directory) as $item) {
+            if ($item instanceof FileAttributes) {
+                $files[] = $item;
             }
-            if ( ! isset($item['type']) || $item['type'] !== 'file') continue;
-            $files[] = [
-                'name' => $item['basename'],
-                'extension' => isset($item['extension']) ? $item['extension'] : null,
-                'size' => isset($item['size']) ? $item['size'] : null,
-                'timestamp' => isset($item['timestamp']) ? $item['timestamp'] : null,
-            ];
         }
+
         return $files;
     }
 
     /**
-     * @param array[] $files from listBackupFiles()
-     * @return array[] table rows: name, extension, size, created
+     * @param list<FileAttributes> $files
      */
-    private function backupFileRows(array $files) {
-        return array_map(function ($file) {
-            return [
-                $file['name'],
-                $file['extension'],
-                $file['size'] === null ? '' : $this->formatBytes($file['size']),
-                $file['timestamp'] === null ? '' : date('D j Y  H:i:s', $file['timestamp']),
-            ];
-        }, $files);
+    private function renderBackupFiles(array $files): void
+    {
+        $this->table(['Name', 'Extension', 'Size', 'Created'], array_map(
+            static function (FileAttributes $file): array {
+                $size = $file->fileSize();
+                $modified = $file->lastModified();
+
+                return [
+                    basename($file->path()),
+                    pathinfo($file->path(), PATHINFO_EXTENSION),
+                    $size === null ? '' : self::formatBytes($size),
+                    $modified === null ? '' : date('D j Y  H:i:s', $modified),
+                ];
+            },
+            $files
+        ));
     }
 
-    /**
-     * @param string $directory
-     * @param string $filename
-     * @return string
-     */
-    private function joinPath($directory, $filename) {
-        $directory = trim((string) $directory, '/');
+    private static function formatBytes(int $bytes): string
+    {
+        $value = (float) max($bytes, 0);
+        foreach (['B', 'KB', 'MB', 'GB'] as $unit) {
+            if ($value < 1024.0) {
+                return (string) round($value, 2) . ' ' . $unit;
+            }
+            $value /= 1024.0;
+        }
+
+        return (string) round($value, 2) . ' TB';
+    }
+
+    private static function joinPath(string $directory, string $filename): string
+    {
+        $directory = trim($directory, '/');
+
         return $directory === '' ? $filename : "{$directory}/{$filename}";
     }
 }

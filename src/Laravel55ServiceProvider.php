@@ -1,135 +1,16 @@
-<?php namespace BackupManager\Laravel;
+<?php
 
-use BackupManager\Databases;
-use BackupManager\Filesystems;
-use BackupManager\Compressors;
-use Symfony\Component\Process\Process;
-use Illuminate\Support\ServiceProvider;
-use BackupManager\ShellProcessing\ShellProcessor;
+declare(strict_types=1);
 
-/**
- * Class BackupManagerServiceProvider
- * @package BackupManager\Laravel
- */
-class Laravel55ServiceProvider extends ServiceProvider {
-    use GetDatabaseConfig;
+namespace BackupManager\Laravel;
 
-    protected $defer = true;
+class_alias(BackupManagerServiceProvider::class, Laravel55ServiceProvider::class);
 
+if (false) {
     /**
-     * Bootstrap the application events.
-     *
-     * @return void
+     * @deprecated since 3.0, use {@see BackupManagerServiceProvider}; removed in 4.0.
      */
-    public function boot() {
-        $configPath = __DIR__ . '/../config/backup-manager.php';
-        $this->publishes([$configPath => config_path('backup-manager.php')], 'config');
-    }
-
-    /**
-     * Register the service provider.
-     *
-     * @return void
-     */
-    public function register() {
-        $configPath = __DIR__ . '/../config/backup-manager.php';
-        $this->mergeConfigFrom($configPath, 'backup-manager');
-        $this->registerFilesystemProvider();
-        $this->registerDatabaseProvider();
-        $this->registerCompressorProvider();
-        $this->registerShellProcessor();
-        $this->registerArtisanCommands();
-    }
-
-    /**
-     * Register the filesystem provider.
-     *
-     * @return void
-     */
-    private function registerFilesystemProvider() {
-        $this->app->bind(\BackupManager\Filesystems\FilesystemProvider::class, function ($app) {
-            $provider = new Filesystems\FilesystemProvider(new RuntimeConfig(function () use ($app) {
-                return $app['config']['backup-manager'] ?: [];
-            }));
-            $provider->add(new Filesystems\Awss3Filesystem);
-            $provider->add(new Filesystems\AsyncAwsS3Filesystem);
-            $provider->add(new Filesystems\GcsFilesystem);
-            $provider->add(new Filesystems\DropboxFilesystem);
-            $provider->add(new Filesystems\DropboxV2Filesystem);
-            $provider->add(new Filesystems\FtpFilesystem);
-            $provider->add(new Filesystems\LocalFilesystem);
-            $provider->add(new Filesystems\RackspaceFilesystem);
-            $provider->add(new Filesystems\SftpFilesystem);
-            $provider->add(new Filesystems\WebdavFilesystem);
-            return $provider;
-        });
-    }
-
-    /**
-     * Register the database provider.
-     *
-     * @return void
-     */
-    private function registerDatabaseProvider() {
-        $this->app->bind(\BackupManager\Databases\DatabaseProvider::class, function ($app) {
-            $provider = new Databases\DatabaseProvider(new RuntimeConfig(function () use ($app) {
-                return $this->mapDatabaseConnections($app['config']['database.connections'] ?: []);
-            }));
-            $provider->add(new Databases\MysqlDatabase);
-            $provider->add(new Databases\PostgresqlDatabase);
-            return $provider;
-        });
-    }
-
-    /**
-     * Register the compressor provider.
-     *
-     * @return void
-     */
-    private function registerCompressorProvider() {
-        $this->app->bind(\BackupManager\Compressors\CompressorProvider::class, function () {
-            $provider = new Compressors\CompressorProvider;
-            $provider->add(new Compressors\GzipCompressor);
-            $provider->add(new Compressors\NullCompressor);
-            return $provider;
-        });
-    }
-
-    /**
-     * Register the filesystem provider.
-     *
-     * @return void
-     */
-    private function registerShellProcessor() {
-        $this->app->bind(\BackupManager\ShellProcessing\ShellProcessor::class, function () {
-            return new ShellProcessor(new Process([], null, null, null, null));
-        });
-    }
-
-    /**
-     * Register the artisan commands.
-     *
-     * @return void
-     */
-    private function registerArtisanCommands() {
-        $this->commands([
-            \BackupManager\Laravel\Laravel55DbBackupCommand::class,
-            \BackupManager\Laravel\Laravel55DbRestoreCommand::class,
-            \BackupManager\Laravel\Laravel55DbListCommand::class,
-        ]);
-    }
-
-    /**
-     * Get the services provided by the provider.
-     *
-     * @return array
-     */
-    public function provides() {
-        return [
-            \BackupManager\Filesystems\FilesystemProvider::class,
-            \BackupManager\Databases\DatabaseProvider::class,
-            \BackupManager\Compressors\CompressorProvider::class,
-            \BackupManager\ShellProcessing\ShellProcessor::class,
-        ];
+    class Laravel55ServiceProvider extends BackupManagerServiceProvider
+    {
     }
 }

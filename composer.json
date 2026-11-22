@@ -19,16 +19,20 @@
         }
     ],
     "require": {
-        "php": "^7.4 || ^8.0",
-        "backup-manager/backup-manager": "^3.3",
-        "illuminate/console": "^7.0 || ^8.0 || ^9.0 || ^10.0 || ^11.0 || ^12.0 || ^13.0",
-        "illuminate/container": "^7.0 || ^8.0 || ^9.0 || ^10.0 || ^11.0 || ^12.0 || ^13.0",
-        "illuminate/support": "^7.0 || ^8.0 || ^9.0 || ^10.0 || ^11.0 || ^12.0 || ^13.0",
-        "symfony/process": "^5.4.51 || ^6.4.33 || ^7.4.5 || ^8.0.5"
+        "php": "^8.2",
+        "backup-manager/backup-manager": "^4.1",
+        "illuminate/console": "^12.71.0 || ^13.40.0",
+        "illuminate/container": "^12.71.0 || ^13.40.0",
+        "illuminate/contracts": "^12.71.0 || ^13.40.0",
+        "illuminate/support": "^12.71.0 || ^13.40.0",
+        "league/flysystem": "^3.35.3",
+        "symfony/console": "^7.4 || ^8.0",
+        "symfony/process": "^7.4.5 || ^8.0.5"
     },
     "require-dev": {
-        "orchestra/testbench": "^5.20 || ^6.48 || ^7.58 || ^8.39 || ^9.18 || ^10.0 || ^11.0",
-        "phpunit/phpunit": "^8.5.21 || ^9.5.10 || ^10.5.35 || ^11.5.50 || ^12.5.8"
+        "mockery/mockery": "^1.6.12",
+        "orchestra/testbench": "^10.12 || ^11.3",
+        "phpunit/phpunit": "^11.5.50 || ^12.5.8"
     },
     "autoload": {
         "psr-4": {
@@ -45,11 +49,11 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "2.x-dev"
+            "dev-master": "3.x-dev"
         },
         "laravel": {
             "providers": [
-                "BackupManager\\Laravel\\Laravel55ServiceProvider"
+                "BackupManager\\Laravel\\BackupManagerServiceProvider"
             ]
         }
     }

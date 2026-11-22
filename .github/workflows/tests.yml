@@ -15,30 +15,17 @@ permissions:
 
 jobs:
   phpunit:
-    name: Laravel ${{ matrix.laravel }}, PHP ${{ matrix.php }}
+    name: Laravel ${{ matrix.laravel }}, PHP ${{ matrix.php }} ${{ matrix.dependencies }}
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
         include:
-          # Every release of Laravel 7-11 has an unpatched security advisory
-          # (CVE-2026-128083 covers everything below 12.71.0), as does Flysystem 1
-          # (Laravel 7 and 8). Composer blocks them unless told not to; users
-          # on these versions make the same choice. Laravel 12 and 13 install
-          # with blocking on.
-          - { laravel: '7',  testbench: '^5.20',  php: '7.4', legacy: true }
-          - { laravel: '8',  testbench: '^6.48',  php: '7.4', legacy: true }
-          - { laravel: '8',  testbench: '^6.48',  php: '8.1', legacy: true }
-          - { laravel: '9',  testbench: '^7.58',  php: '8.1', legacy: true }
-          - { laravel: '9',  testbench: '^7.58',  php: '8.2', legacy: true }
-          - { laravel: '10', testbench: '^8.39',  php: '8.1', legacy: true }
-          - { laravel: '10', testbench: '^8.39',  php: '8.3', legacy: true }
-          - { laravel: '11', testbench: '^9.18',  php: '8.2', legacy: true }
-          - { laravel: '11', testbench: '^9.18',  php: '8.4', legacy: true }
-          - { laravel: '12', testbench: '^10.0',  php: '8.2' }
-          - { laravel: '12', testbench: '^10.0',  php: '8.5' }
-          - { laravel: '13', testbench: '^11.0',  php: '8.3' }
-          - { laravel: '13', testbench: '^11.0',  php: '8.5' }
+          - { laravel: '12', testbench: '^10.12', php: '8.2', dependencies: lowest }
+          - { laravel: '12', testbench: '^10.12', php: '8.2', dependencies: highest }
+          - { laravel: '12', testbench: '^10.12', php: '8.5', dependencies: highest }
+          - { laravel: '13', testbench: '^11.3',  php: '8.3', dependencies: highest }
+          - { laravel: '13', testbench: '^11.3',  php: '8.5', dependencies: highest }
 
     env:
       BACKUP_MANAGER_TEST_MYSQL_PASSWORD: root
@@ -59,22 +46,17 @@ jobs:
           sudo systemctl start mysql.service
           mysql -uroot -proot -e 'CREATE DATABASE backup_manager_test'
 
-      - name: Select Laravel ${{ matrix.laravel }}
+      - name: Select Laravel ${{ matrix.laravel }} (through Testbench)
         run: |
-          composer require --no-update "illuminate/support:^${{ matrix.laravel }}.0"
           composer require --no-update --dev "orchestra/testbench:${{ matrix.testbench }}"
-
-      - name: Allow packages with advisories (legacy cells)
-        if: matrix.legacy
-        run: composer config audit.block-insecure false
 
       - name: Download dependencies
         uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0
         with:
-          dependency-versions: highest
+          dependency-versions: ${{ matrix.dependencies }}
 
       - name: Show resolved key packages
-        run: composer show | grep -E '^(backup-manager/backup-manager|laravel/framework|league/flysystem |orchestra/testbench |phpunit/phpunit|symfony/process)'
+        run: composer show | grep -E '^(backup-manager/backup-manager|laravel/framework|league/flysystem |orchestra/testbench |phpunit/phpunit|symfony/(console|process) )'
 
       - name: Run tests
         run: vendor/bin/phpunit
@@ -97,20 +79,3 @@ jobs:
 
       - name: Audit dependencies for security advisories
         run: composer audit
-
-  composer-normalize:
-    name: Composer Normalize
-    runs-on: ubuntu-24.04
-    steps:
-      - name: Set up PHP
-        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
-        with:
-          php-version: '8.4'
-          coverage: none
-          tools: composer-normalize
-
-      - name: Checkout code
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-
-      - name: Normalize
-        run: composer-normalize --dry-run

@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<psalm
+    errorLevel="2"
+    findUnusedCode="false"
+    resolveFromConfigFile="true"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="https://getpsalm.org/schema/config"
+    xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
+>
+    <projectFiles>
+        <directory name="src" />
+        <ignoreFiles>
+            <directory name="vendor" />
+            <!-- Deprecated class_alias stubs; their `if (false)` declarations exist for IDEs only. -->
+            <file name="src/Laravel55ServiceProvider.php" />
+            <file name="src/Laravel55DbBackupCommand.php" />
+            <file name="src/Laravel55DbRestoreCommand.php" />
+            <file name="src/Laravel55DbListCommand.php" />
+        </ignoreFiles>
+    </projectFiles>
+    <issueHandlers>
+        <!-- The service provider stays extensible by design. -->
+        <ClassMustBeFinal errorLevel="suppress"/>
+    </issueHandlers>
+</psalm>

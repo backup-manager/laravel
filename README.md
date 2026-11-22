@@ -3,7 +3,7 @@
 [![Tests](https://github.com/backup-manager/laravel/actions/workflows/tests.yml/badge.svg)](https://github.com/backup-manager/laravel/actions/workflows/tests.yml)
 [![Latest Version](https://img.shields.io/packagist/v/backup-manager/laravel)](https://packagist.org/packages/backup-manager/laravel)
 [![PHP Version](https://img.shields.io/packagist/dependency-v/backup-manager/laravel/php)](https://packagist.org/packages/backup-manager/laravel)
-[![Laravel](https://img.shields.io/badge/Laravel-7%E2%80%9313-FF2D20?logo=laravel&logoColor=white)](#requirements)
+[![Laravel](https://img.shields.io/badge/Laravel-12%20%7C%2013-FF2D20?logo=laravel&logoColor=white)](#requirements)
 [![Downloads](https://img.shields.io/packagist/dt/backup-manager/laravel)](https://packagist.org/packages/backup-manager/laravel/stats)
 [![License](https://img.shields.io/packagist/l/backup-manager/laravel)](LICENSE)
 
@@ -17,16 +17,15 @@ This package integrates the framework-agnostic [Backup Manager](https://github.c
 - [Artisan commands](#artisan-commands)
 - [Using the Manager in code](#using-the-manager-in-code)
 - [Scheduling backups](#scheduling-backups)
-- [Lumen](#lumen)
+- [Upgrading](#upgrading)
 - [Contributing](#contributing)
 - [License](#license)
 
 ## Requirements
 
-- PHP 7.4+
-- Laravel 7 to 13 (CI tests every major). Laravel 12 and 13 are the versions
-  Laravel still patches; Composer refuses older Laravel releases by default
-  because each has an unpatched security advisory.
+- PHP 8.2+
+- Laravel 12 or 13. For Laravel 7–11 use version 2.x; every release of those
+  lines has an unpatched security advisory.
 - MySQL or MariaDB: the `mysqldump` and `mysql` binaries
 - PostgreSQL: the `pg_dump` and `psql` binaries
 - Gzip compression: the `gzip` and `gunzip` binaries
@@ -40,10 +39,10 @@ composer require backup-manager/laravel
 The service provider is registered by package discovery. Publish the storage configuration:
 
 ```shell
-php artisan vendor:publish --provider="BackupManager\Laravel\Laravel55ServiceProvider"
+php artisan vendor:publish --provider="BackupManager\Laravel\BackupManagerServiceProvider"
 ```
 
-Then install the Flysystem adapter package for each storage type you use. Laravel 9 and later use Flysystem 3:
+Then install the Flysystem 3 adapter package for each storage type you use:
 
 | Type | Package (Flysystem 3) |
 |---|---|
@@ -56,7 +55,11 @@ Then install the Flysystem adapter package for each storage type you use. Larave
 | `Sftp` | `league/flysystem-sftp-v3` |
 | `Webdav` | `league/flysystem-webdav` |
 
-Laravel 7 and 8 use Flysystem 1; see the [core adapter table](https://github.com/backup-manager/backup-manager/tree/3.x#installation) for the matching packages. If a package is missing, the backup fails with an error naming the package to install.
+If a package is missing, the backup fails with an error naming the package to install. To add your own filesystem type, extend the binding in a service provider:
+
+```php
+$this->app->extend(FilesystemProvider::class, fn ($provider) => tap($provider)->add(new MyFilesystem()));
+```
 
 ## Configuration
 
@@ -83,7 +86,7 @@ Configuration is read when a backup runs, so connections changed at runtime with
 
 ## Artisan commands
 
-`db:backup`, `db:restore` and `db:list` prompt for any option you leave out.
+`db:backup`, `db:restore` and `db:list` prompt for any option you leave out. In a non-interactive run (the scheduler, `--no-interaction`) a missing option is an error instead.
 
 ```shell
 php artisan db:backup --database=mysql --destination=s3 --destinationPath=project/backup --timestamp="Y-m-d_H-i-s" --compression=gzip
@@ -117,18 +120,13 @@ Schedule::command('db:backup --database=mysql --destination=s3 --destinationPath
     ->twiceDaily(13, 21);
 ```
 
-## Lumen
+## Upgrading
 
-Register the provider and configuration in `bootstrap/app.php`, then copy `vendor/backup-manager/laravel/config/backup-manager.php` to `config/backup-manager.php`:
-
-```php
-$app->configure('backup-manager');
-$app->register(BackupManager\Laravel\Lumen55ServiceProvider::class);
-```
+See [UPGRADE.md](UPGRADE.md). Version 2.x (Laravel 7–13, PHP 7.4+) receives security fixes.
 
 ## Contributing
 
-Run the tests with `vendor/bin/phpunit`. The MySQL backup-and-restore test runs when `BACKUP_MANAGER_TEST_MYSQL_PASSWORD` is set (root user, database `backup_manager_test` on 127.0.0.1 and the default socket); CI runs it on every Laravel version. Proposals for new features are welcome as [issues](https://github.com/backup-manager/laravel/issues/new).
+Run the tests with `vendor/bin/phpunit`; CI also runs PHPStan, Psalm and PHP-CS-Fixer (PSR-12). The MySQL backup-and-restore test runs when `BACKUP_MANAGER_TEST_MYSQL_PASSWORD` is set (root user, database `backup_manager_test` on 127.0.0.1 and the default socket); CI runs it on every Laravel version. Proposals for new features are welcome as [issues](https://github.com/backup-manager/laravel/issues/new).
 
 Maintained by [Shawn McCool](https://shawnmc.cool) and [contributors](https://github.com/backup-manager/laravel/graphs/contributors).
 

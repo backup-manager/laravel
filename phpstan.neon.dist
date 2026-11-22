@@ -1,0 +1,7 @@
+parameters:
+    level: 8
+    paths:
+        - src
+    excludePaths:
+        # Deprecated class_alias stubs; their `if (false)` declarations exist for IDEs only.
+        - src/Laravel55*.php

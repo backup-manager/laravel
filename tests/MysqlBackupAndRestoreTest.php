@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BackupManager\Laravel\Tests;
 
 use Illuminate\Support\Facades\Artisan;
@@ -20,7 +22,7 @@ class MysqlBackupAndRestoreTest extends TestCase
         parent::setUp();
     }
 
-    protected function getEnvironmentSetUp($app)
+    protected function getEnvironmentSetUp($app): void
     {
         parent::getEnvironmentSetUp($app);
 
@@ -42,17 +44,17 @@ class MysqlBackupAndRestoreTest extends TestCase
         ]);
     }
 
-    public function test_it_backs_up_and_restores_over_tcp()
+    public function test_it_backs_up_and_restores_over_tcp(): void
     {
         $this->backUpAndRestore('tcp');
     }
 
-    public function test_it_backs_up_and_restores_over_a_unix_socket()
+    public function test_it_backs_up_and_restores_over_a_unix_socket(): void
     {
         $this->backUpAndRestore('socket');
     }
 
-    private function backUpAndRestore($connection)
+    private function backUpAndRestore(string $connection): void
     {
         $db = DB::connection($connection);
         $db->statement('DROP TABLE IF EXISTS widgets');
