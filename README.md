@@ -18,6 +18,7 @@ This package integrates the framework-agnostic [Backup Manager](https://github.c
 - [Using the Manager in code](#using-the-manager-in-code)
 - [Scheduling backups](#scheduling-backups)
 - [Lumen](#lumen)
+- [Supported versions](#supported-versions)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -67,7 +68,7 @@ Laravel 7 and 8 use Flysystem 1; see the [core adapter table](https://github.com
 ```php
 'mysql' => [
     'driver' => 'mysql',
-    // ... Laravel's usual keys; unix_socket is used when set ...
+    // ... Laravel's usual keys; url (DB_URL) and unix_socket are used when set ...
     'singleTransaction' => true,         // --single-transaction (InnoDB)
     'ignoreTables' => ['sessions'],      // --ignore-table for each
     'onlyTables' => ['users', 'orders'], // dump only these tables
@@ -125,6 +126,13 @@ Register the provider and configuration in `bootstrap/app.php`, then copy `vendo
 $app->configure('backup-manager');
 $app->register(BackupManager\Laravel\Lumen55ServiceProvider::class);
 ```
+
+## Supported versions
+
+| Version | Laravel | PHP | Core library | Support |
+|---|---|---|---|---|
+| 3.x | 12, 13 | 8.2+ | 4.x | active |
+| 2.x | 7–13 | 7.4+ | 3.x | security fixes until 2027-12-31 |
 
 ## Contributing
 

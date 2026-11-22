@@ -6,6 +6,21 @@ adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [2.2.0] - 2026-11-22
+
+### Added
+- Database connections configured with `url` (`DB_URL`) are backed up: the
+  URL is parsed with Laravel's `ConfigurationUrlParser`, so its parts take
+  precedence over the connection's other keys, as when Laravel connects.
+
+### Security
+- Requires `backup-manager/backup-manager` ^3.3.1, which escapes the backup
+  file path in MySQL restores (a crafted backup file name could run shell
+  commands during `db:restore`).
+
+### Documentation
+- 2.x receives security fixes until 2027-12-31; 3.x is the active line.
+
 ## [2.1.0] - 2026-11-22
 
 ### Added

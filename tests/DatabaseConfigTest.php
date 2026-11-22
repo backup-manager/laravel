@@ -111,4 +111,32 @@ class DatabaseConfigTest extends TestCase
 
         $this->assertStringContainsString("--host='primary.example'", $this->dumpCommandFor('app'));
     }
+
+    public function test_a_connection_url_is_used()
+    {
+        config(['database.connections.app' => [
+            'driver' => 'mysql',
+            'url' => 'mysql://user:p%40ss@db.example:3307/shop?unix_socket=/run/mysqld/mysqld.sock',
+            'host' => '127.0.0.1',
+            'database' => 'forge',
+        ]]);
+
+        $command = $this->dumpCommandFor('app');
+
+        $this->assertStringContainsString("--socket='/run/mysqld/mysqld.sock'", $command);
+        $this->assertStringContainsString("--user='user'", $command);
+        $this->assertStringContainsString("--password='p@ss'", $command);
+        $this->assertStringContainsString("'shop'", $command);
+    }
+
+    public function test_a_postgres_url_selects_the_postgresql_database()
+    {
+        config(['database.connections.app' => ['driver' => 'pgsql', 'url' => 'postgres://user:secret@pg.example:5433/shop']]);
+
+        $command = $this->dumpCommandFor('app');
+
+        $this->assertStringContainsString("--host='pg.example'", $command);
+        $this->assertStringContainsString("--port='5433'", $command);
+        $this->assertStringContainsString("'shop'", $command);
+    }
 }
