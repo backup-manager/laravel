@@ -25,18 +25,20 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # Laravel 7 and 8 bring Flysystem 1, and every release of Laravel 7
-          # and of Flysystem 1 has a security advisory; Composer blocks them
-          # unless told not to. Users on these versions make the same choice.
+          # Every release of Laravel 7-11 has an unpatched security advisory
+          # (e.g. CVE-2026-48019 covers all of 9-11), as does Flysystem 1
+          # (Laravel 7 and 8). Composer blocks them unless told not to; users
+          # on these versions make the same choice. Laravel 12 and 13 install
+          # with blocking on.
           - { laravel: '7',  testbench: '^5.20',  php: '7.4', legacy: true }
           - { laravel: '8',  testbench: '^6.48',  php: '7.4', legacy: true }
           - { laravel: '8',  testbench: '^6.48',  php: '8.1', legacy: true }
-          - { laravel: '9',  testbench: '^7.58',  php: '8.0' }
-          - { laravel: '9',  testbench: '^7.58',  php: '8.2' }
-          - { laravel: '10', testbench: '^8.39',  php: '8.1' }
-          - { laravel: '10', testbench: '^8.39',  php: '8.3' }
-          - { laravel: '11', testbench: '^9.18',  php: '8.2' }
-          - { laravel: '11', testbench: '^9.18',  php: '8.4' }
+          - { laravel: '9',  testbench: '^7.58',  php: '8.0', legacy: true }
+          - { laravel: '9',  testbench: '^7.58',  php: '8.2', legacy: true }
+          - { laravel: '10', testbench: '^8.39',  php: '8.1', legacy: true }
+          - { laravel: '10', testbench: '^8.39',  php: '8.3', legacy: true }
+          - { laravel: '11', testbench: '^9.18',  php: '8.2', legacy: true }
+          - { laravel: '11', testbench: '^9.18',  php: '8.4', legacy: true }
           - { laravel: '12', testbench: '^10.0',  php: '8.2' }
           - { laravel: '12', testbench: '^10.0',  php: '8.5' }
           - { laravel: '13', testbench: '^11.0',  php: '8.3' }
