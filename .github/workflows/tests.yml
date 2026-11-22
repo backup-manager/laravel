@@ -26,14 +26,14 @@ jobs:
       matrix:
         include:
           # Every release of Laravel 7-11 has an unpatched security advisory
-          # (e.g. CVE-2026-48019 covers all of 9-11), as does Flysystem 1
+          # (CVE-2026-128083 covers everything below 12.71.0), as does Flysystem 1
           # (Laravel 7 and 8). Composer blocks them unless told not to; users
           # on these versions make the same choice. Laravel 12 and 13 install
           # with blocking on.
           - { laravel: '7',  testbench: '^5.20',  php: '7.4', legacy: true }
           - { laravel: '8',  testbench: '^6.48',  php: '7.4', legacy: true }
           - { laravel: '8',  testbench: '^6.48',  php: '8.1', legacy: true }
-          - { laravel: '9',  testbench: '^7.58',  php: '8.0', legacy: true }
+          - { laravel: '9',  testbench: '^7.58',  php: '8.1', legacy: true }
           - { laravel: '9',  testbench: '^7.58',  php: '8.2', legacy: true }
           - { laravel: '10', testbench: '^8.39',  php: '8.1', legacy: true }
           - { laravel: '10', testbench: '^8.39',  php: '8.3', legacy: true }
