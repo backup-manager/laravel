@@ -20,7 +20,7 @@
     ],
     "require": {
         "php": "^8.2",
-        "backup-manager/backup-manager": "^4.1",
+        "backup-manager/backup-manager": "^4.1.1",
         "illuminate/console": "^12.71.0 || ^13.40.0",
         "illuminate/container": "^12.71.0 || ^13.40.0",
         "illuminate/contracts": "^12.71.0 || ^13.40.0",

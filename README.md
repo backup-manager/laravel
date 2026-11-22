@@ -17,6 +17,7 @@ This package integrates the framework-agnostic [Backup Manager](https://github.c
 - [Artisan commands](#artisan-commands)
 - [Using the Manager in code](#using-the-manager-in-code)
 - [Scheduling backups](#scheduling-backups)
+- [Supported versions](#supported-versions)
 - [Upgrading](#upgrading)
 - [Contributing](#contributing)
 - [License](#license)
@@ -70,7 +71,7 @@ $this->app->extend(FilesystemProvider::class, fn ($provider) => tap($provider)->
 ```php
 'mysql' => [
     'driver' => 'mysql',
-    // ... Laravel's usual keys; unix_socket is used when set ...
+    // ... Laravel's usual keys; url (DB_URL) and unix_socket are used when set ...
     'singleTransaction' => true,         // --single-transaction (InnoDB)
     'ignoreTables' => ['sessions'],      // --ignore-table for each
     'onlyTables' => ['users', 'orders'], // dump only these tables
@@ -120,9 +121,16 @@ Schedule::command('db:backup --database=mysql --destination=s3 --destinationPath
     ->twiceDaily(13, 21);
 ```
 
+## Supported versions
+
+| Version | Laravel | PHP | Core library | Support |
+|---|---|---|---|---|
+| 3.x | 12, 13 | 8.2+ | 4.x | active |
+| 2.x | 7–13 | 7.4+ | 3.x | security fixes until 2027-12-31 |
+
 ## Upgrading
 
-See [UPGRADE.md](UPGRADE.md). Version 2.x (Laravel 7–13, PHP 7.4+) receives security fixes.
+See [UPGRADE.md](UPGRADE.md).
 
 ## Contributing
 
