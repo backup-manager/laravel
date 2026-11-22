@@ -1,178 +1,137 @@
 # Laravel Driver for the Database Backup Manager
 
-This package pulls in the framework agnostic [Backup Manager](https://github.com/backup-manager/backup-manager) and provides seamless integration with **Laravel**.
+[![Tests](https://github.com/backup-manager/laravel/actions/workflows/tests.yml/badge.svg)](https://github.com/backup-manager/laravel/actions/workflows/tests.yml)
+[![Latest Version](https://img.shields.io/packagist/v/backup-manager/laravel)](https://packagist.org/packages/backup-manager/laravel)
+[![PHP Version](https://img.shields.io/packagist/dependency-v/backup-manager/laravel/php)](https://packagist.org/packages/backup-manager/laravel)
+[![Laravel](https://img.shields.io/badge/Laravel-7%E2%80%9313-FF2D20?logo=laravel&logoColor=white)](#requirements)
+[![Downloads](https://img.shields.io/packagist/dt/backup-manager/laravel)](https://packagist.org/packages/backup-manager/laravel/stats)
+[![License](https://img.shields.io/packagist/l/backup-manager/laravel)](LICENSE)
 
-[Watch a video tour](https://www.youtube.com/watch?v=vWXy0R8OavM) to get an idea what is possible with this package.
+Back up and restore your Laravel application's MySQL and PostgreSQL databases to S3, Google Cloud Storage, Dropbox, FTP, SFTP, WebDAV or local disk, from Artisan or from your own code.
 
-> Note: This package is for Laravel integration only. For information about the framework-agnostic core package (or the Symfony driver) please see [the base package repository](https://github.com/backup-manager/backup-manager).
+This package integrates the framework-agnostic [Backup Manager](https://github.com/backup-manager/backup-manager) into **Laravel**. For the core library or the Symfony integration, see [the core repository](https://github.com/backup-manager/backup-manager).
 
-### Table of Contents
-
-- [Stability Notice](#stability-notice)
 - [Requirements](#requirements)
 - [Installation](#installation)
-- [Scheduling Backups](#scheduling-backups)
-- [Contribution Guidelines](#contribution-guidelines)
-- [Maintainers](#maintainers)
+- [Configuration](#configuration)
+- [Artisan commands](#artisan-commands)
+- [Using the Manager in code](#using-the-manager-in-code)
+- [Scheduling backups](#scheduling-backups)
+- [Lumen](#lumen)
+- [Contributing](#contributing)
 - [License](#license)
-- [Changelog](#changelog)
 
-### Stability Notice
+## Requirements
 
-It's stable enough, you'll need to understand filesystem permissions.
+- PHP 7.4+
+- Laravel 7 to 13 (CI tests every major). Laravel 12 and 13 are the versions
+  Laravel still patches; Composer refuses older Laravel releases by default
+  because each has an unpatched security advisory.
+- MySQL or MariaDB: the `mysqldump` and `mysql` binaries
+- PostgreSQL: the `pg_dump` and `psql` binaries
+- Gzip compression: the `gzip` and `gunzip` binaries
 
-This package is being actively developed, and we would like to get feedback to improve it. [Please feel free to submit feedback.](https://github.com/backup-manager/laravel/issues/new)
-
-### Requirements
-
-- PHP 7.3+
-- Laravel 5.5+
-- MySQL support requires `mysqldump` and `mysql` command-line binaries
-- PostgreSQL support requires `pg_dump` and `psql` command-line binaries
-- Gzip support requires `gzip` and `gunzip` command-line binaries
-
-### Installation
-
-**Composer**
-
-Run the following to include this via Composer
+## Installation
 
 ```shell
 composer require backup-manager/laravel
 ```
 
-Then, you'll need to select the appropriate packages for the adapters that you want to use.
+The service provider is registered by package discovery. Publish the storage configuration:
 
 ```shell
-# to support s3 or google cs
-composer require league/flysystem-aws-s3-v3
-
-# to support dropbox
-composer require srmklive/flysystem-dropbox-v2
-
-# to support rackspace
-composer require league/flysystem-rackspace
-
-# to support sftp
-composer require league/flysystem-sftp
-
-# to support gcs
-composer require superbalist/flysystem-google-storage
-```
-
-#### Laravel 5 Configuration
-
-To install into a Laravel project, first do the composer install then add *ONE *of the following classes to your config/app.php service providers list.
-
-```php
-// FOR LARAVEL 5.5 +
-BackupManager\Laravel\Laravel55ServiceProvider::class,
-```
-
-Publish the storage configuration file.
-
-```php
 php artisan vendor:publish --provider="BackupManager\Laravel\Laravel55ServiceProvider"
 ```
 
-The Backup Manager will make use of Laravel's database configuration. But, it won't know about any connections that might be tied to other environments, so it can be best to just list multiple connections in the `config/database.php` file.
+Then install the Flysystem adapter package for each storage type you use. Laravel 9 and later use Flysystem 3:
 
-We can also add extra parameters on our backup manager commands by configuring extra params on `.env` file:
+| Type | Package (Flysystem 3) |
+|---|---|
+| `Local` | included |
+| `AwsS3` | `league/flysystem-aws-s3-v3` |
+| `AsyncAwsS3` | `league/flysystem-async-aws-s3` |
+| `Gcs` | `league/flysystem-google-cloud-storage` |
+| `Dropbox` | `spatie/flysystem-dropbox` |
+| `Ftp` | `league/flysystem-ftp` |
+| `Sftp` | `league/flysystem-sftp-v3` |
+| `Webdav` | `league/flysystem-webdav` |
 
-```
-BACKUP_MANAGER_EXTRA_PARAMS="--column-statistics=0 --max-allowed-packet"
-```
+Laravel 7 and 8 use Flysystem 1; see the [core adapter table](https://github.com/backup-manager/backup-manager/tree/3.x#installation) for the matching packages. If a package is missing, the backup fails with an error naming the package to install.
 
-#### Lumen Configuration
+## Configuration
 
-To install into a Lumen project, first do the composer install then add the configuration file loader and *ONE* of the following service providers to your `bootstrap/app.php`.
+**Storage** connections live in `config/backup-manager.php`. Each entry has a `type` and that type's settings. S3-compatible services (DigitalOcean Spaces, MinIO, ...) use the `AwsS3` type with an `endpoint` (and `use_path_style_endpoint` where the service needs it).
+
+**Databases** come from Laravel's own `config/database.php` connections; `mysql`, `mariadb` and `pgsql` connections can be backed up. MySQL and MariaDB connections accept these extra keys, which Laravel ignores and the backup uses:
 
 ```php
-// FOR LUMEN 5.5 AND ABOVE
+'mysql' => [
+    'driver' => 'mysql',
+    // ... Laravel's usual keys; unix_socket is used when set ...
+    'singleTransaction' => true,         // --single-transaction (InnoDB)
+    'ignoreTables' => ['sessions'],      // --ignore-table for each
+    'onlyTables' => ['users', 'orders'], // dump only these tables
+    'ssl' => false,                      // --ssl
+    'columnStatistics' => false,         // --column-statistics=0 (MySQL 8 mysqldump against older servers)
+    'extraParams' => '--max-allowed-packet=64M', // appended to mysqldump
+],
+```
+
+`extraParams` defaults to the `BACKUP_MANAGER_EXTRA_PARAMS` environment variable for every connection that does not set it.
+
+Configuration is read when a backup runs, so connections changed at runtime with `config([...])` are used, for example a tenant database selected before calling `db:backup`.
+
+## Artisan commands
+
+`db:backup`, `db:restore` and `db:list` prompt for any option you leave out.
+
+```shell
+php artisan db:backup --database=mysql --destination=s3 --destinationPath=project/backup --timestamp="Y-m-d_H-i-s" --compression=gzip
+php artisan db:list --source=s3 --path=project
+php artisan db:restore --source=s3 --sourcePath=project/backup2026-11-22_04-00-00.gz --database=mysql --compression=gzip
+```
+
+`--timestamp` is a [date format](https://www.php.net/manual/en/datetime.format.php) appended to the destination path; the compressor adds its extension (`.gz`).
+
+## Using the Manager in code
+
+`BackupManager\Manager` is resolved by the container:
+
+```php
+use BackupManager\Filesystems\Destination;
+use BackupManager\Manager;
+
+public function backup(Manager $manager)
+{
+    $manager->makeBackup()->run('mysql', [new Destination('s3', 'project/backup.sql')], 'gzip');
+}
+```
+
+This package backs up databases only. To delete old backups, use your storage's lifecycle rules (for example S3 lifecycle expiration) or Laravel's `Storage` facade.
+
+## Scheduling backups
+
+```php
+// routes/console.php (Laravel 11+) or the schedule() method of app/Console/Kernel.php
+Schedule::command('db:backup --database=mysql --destination=s3 --destinationPath=' . app()->environment() . '/backup --timestamp="Y_m_d_H_i_s" --compression=gzip')
+    ->twiceDaily(13, 21);
+```
+
+## Lumen
+
+Register the provider and configuration in `bootstrap/app.php`, then copy `vendor/backup-manager/laravel/config/backup-manager.php` to `config/backup-manager.php`:
+
+```php
 $app->configure('backup-manager');
 $app->register(BackupManager\Laravel\Lumen55ServiceProvider::class);
 ```
 
-Copy the `vendor/backup-manager/laravel/config/backup-manager.php` file to `config/backup-manager.php` and configure it to suit your needs.
+## Contributing
 
-**IoC Resolution**
+Run the tests with `vendor/bin/phpunit`. The MySQL backup-and-restore test runs when `BACKUP_MANAGER_TEST_MYSQL_PASSWORD` is set (root user, database `backup_manager_test` on 127.0.0.1 and the default socket); CI runs it on every Laravel version. Proposals for new features are welcome as [issues](https://github.com/backup-manager/laravel/issues/new).
 
-`BackupManager\Manager` can be automatically resolved through constructor injection thanks to Laravel's IoC container.
+Maintained by [Shawn McCool](https://shawnmc.cool) and [contributors](https://github.com/backup-manager/laravel/graphs/contributors).
 
-```php
-use BackupManager\Manager;
+## License
 
-public function __construct(Manager $manager) {
-    $this->manager = $manager;
-}
-```
-
-It can also be resolved manually from the container.
-
-```php
-$manager = App::make(\BackupManager\Manager::class);
-```
-
-**Artisan Commands**
-
-There are three commands available `db:backup`, `db:restore` and `db:list`.
-
-All will prompt you with simple questions to successfully execute the command.
-
-**Example Command for 24hour scheduled cronjob**
-
-```
-php artisan db:backup --database=mysql --destination=dropbox --destinationPath=project --timestamp="d-m-Y" --compression=gzip
-```
-
-This command will backup your database to dropbox using mysql and gzip compresion in path /backups/project/DATE.gz (ex: /backups/project/31-7-2015.gz)
-
-### Scheduling Backups
-
-It's possible to schedule backups using Laravel's scheduler.
-
-```PHP
-/**
- * Define the application's command schedule.
- *
- * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
- * @return void
- */
- protected function schedule(Schedule $schedule) {
-     $environment = config('app.env');
-     $schedule->command(
-         "db:backup --database=mysql --destination=s3 --destinationPath=/{$environment}/projectname --timestamp="Y_m_d_H_i_s" --compression=gzip"
-         )->twiceDaily(13,21);
- }
-```
-
-### Contribution Guidelines
-
-We recommend using the vagrant configuration supplied with this package for development and contribution. Simply install VirtualBox, Vagrant, and Ansible then run `vagrant up` in the root folder. A virtualmachine specifically designed for development of the package will be built and launched for you.
-
-When contributing please consider the following guidelines:
-
-- please conform to the code style of the project, it's essentially PSR-2 with a few differences.
-    1. The NOT operator when next to parenthesis should be surrounded by a single space. `if ( ! is_null(...)) {`.
-    2. Interfaces should NOT be suffixed with `Interface`, Traits should NOT be suffixed with `Trait`.
-- All methods and classes must contain docblocks.
-- Ensure that you submit tests that have minimal 100% coverage.
-- When planning a pull-request to add new functionality, it may be wise to [submit a proposal](https://github.com/backup-manager/laravel/issues/new) to ensure compatibility with the project's goals.
-
-### Maintainers
-
-This package is maintained by [Shawn McCool](http://shawnmc.cool) and [open-source heroes](https://github.com/backup-manager/laravel/pulls?q=is%3Apr+is%3Aclosed).
-
-### License
-
-This package is licensed under the [MIT license](https://github.com/backup-manager/laravel/blob/master/LICENSE).
-
-### Changelog
-
-**2.0**
-
-_Released on 2020-04-30_
-
-Remove support for all Laravel versions below 5.5. All older versions should use the backup-manager `^1.0`.
-
-Since so many dependencies in Laravel / Symfony have changed it became impossible to support newer versions in the same code-base. Release `^1.0` is stable and is always accepting new stability fixes (we haven't seen anything to fix in a long time).
+[MIT](LICENSE). See [CHANGELOG.md](CHANGELOG.md) for release notes.

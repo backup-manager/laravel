@@ -10,6 +10,7 @@ use BackupManager\Filesystems\FilesystemProvider;
  */
 class DbListCommand extends Command {
     use AutoComplete;
+    use ListsBackupFiles;
 
     /**
      * The console command name.
@@ -70,17 +71,7 @@ class DbListCommand extends Command {
         }
 
         $filesystem = $this->filesystems->get($this->option('source'));
-        $contents = $filesystem->listContents($this->option('path'));
-        $rows = [];
-        foreach ($contents as $file) {
-            if ($file['type'] == 'dir') continue;
-            $rows[] = [
-                $file['basename'],
-                key_exists('extension', $file) ? $file['extension'] : null,
-                $this->formatBytes($file['size']),
-                date('D j Y  H:i:s', $file['timestamp'])
-            ];
-        }
+        $rows = $this->backupFileRows($this->listBackupFiles($filesystem, $this->option('path')));
         $this->table(['Name', 'Extension', 'Size', 'Created'], $rows);
     }
 
@@ -191,6 +182,6 @@ class DbListCommand extends Command {
         $bytes = max($bytes, 0);
         $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
         $pow = min($pow, count($units) - 1);
-        return round($bytes, $precision) . ' ' . $units[$pow];
+        return round($bytes / pow(1024, $pow), $precision) . ' ' . $units[$pow];
     }
 } 

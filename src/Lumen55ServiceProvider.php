@@ -5,7 +5,6 @@ use BackupManager\Filesystems;
 use BackupManager\Compressors;
 use Symfony\Component\Process\Process;
 use Illuminate\Support\ServiceProvider;
-use BackupManager\Config\Config;
 use BackupManager\ShellProcessing\ShellProcessor;
 
 /**
@@ -39,14 +38,19 @@ class Lumen55ServiceProvider extends ServiceProvider {
      */
     private function registerFilesystemProvider() {
         $this->app->bind(\BackupManager\Filesystems\FilesystemProvider::class, function ($app) {
-            $provider = new Filesystems\FilesystemProvider(new Config($app['config']['backup-manager']));
+            $provider = new Filesystems\FilesystemProvider(new RuntimeConfig(function () use ($app) {
+                return $app['config']['backup-manager'] ?: [];
+            }));
             $provider->add(new Filesystems\Awss3Filesystem);
+            $provider->add(new Filesystems\AsyncAwsS3Filesystem);
+            $provider->add(new Filesystems\GcsFilesystem);
             $provider->add(new Filesystems\DropboxFilesystem);
             $provider->add(new Filesystems\DropboxV2Filesystem);
             $provider->add(new Filesystems\FtpFilesystem);
             $provider->add(new Filesystems\LocalFilesystem);
             $provider->add(new Filesystems\RackspaceFilesystem);
             $provider->add(new Filesystems\SftpFilesystem);
+            $provider->add(new Filesystems\WebdavFilesystem);
             return $provider;
         });
     }
@@ -58,7 +62,9 @@ class Lumen55ServiceProvider extends ServiceProvider {
      */
     private function registerDatabaseProvider() {
         $this->app->bind(\BackupManager\Databases\DatabaseProvider::class, function ($app) {
-            $provider = new Databases\DatabaseProvider($this->getDatabaseConfig($app['config']['database.connections']));
+            $provider = new Databases\DatabaseProvider(new RuntimeConfig(function () use ($app) {
+                return $this->mapDatabaseConnections($app['config']['database.connections'] ?: []);
+            }));
             $provider->add(new Databases\MysqlDatabase);
             $provider->add(new Databases\PostgresqlDatabase);
             return $provider;
@@ -86,7 +92,7 @@ class Lumen55ServiceProvider extends ServiceProvider {
      */
     private function registerShellProcessor() {
         $this->app->bind(\BackupManager\ShellProcessing\ShellProcessor::class, function () {
-            return new ShellProcessor(new Process(''));
+            return new ShellProcessor(new Process([], null, null, null, null));
         });
     }
 
@@ -112,6 +118,7 @@ class Lumen55ServiceProvider extends ServiceProvider {
         return [
             \BackupManager\Filesystems\FilesystemProvider::class,
             \BackupManager\Databases\DatabaseProvider::class,
+            \BackupManager\Compressors\CompressorProvider::class,
             \BackupManager\ShellProcessing\ShellProcessor::class,
         ];
     }
