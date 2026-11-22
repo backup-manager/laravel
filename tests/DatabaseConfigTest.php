@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BackupManager\Laravel\Tests;
 
 use BackupManager\Databases\DatabaseProvider;
@@ -8,7 +10,11 @@ use BackupManager\Databases\MysqlDatabase;
 
 class DatabaseConfigTest extends TestCase
 {
-    private function mysqlConnection(array $overrides = [])
+    /**
+     * @param array<string, mixed> $overrides
+     * @return array<string, mixed>
+     */
+    private function mysqlConnection(array $overrides = []): array
     {
         return array_merge([
             'driver' => 'mysql',
@@ -20,12 +26,12 @@ class DatabaseConfigTest extends TestCase
         ], $overrides);
     }
 
-    private function dumpCommandFor($connection)
+    private function dumpCommandFor(string $connection): string
     {
         return $this->app->make(DatabaseProvider::class)->get($connection)->getDumpCommandLine('out.sql');
     }
 
-    public function test_it_maps_a_mysql_connection()
+    public function test_it_maps_a_mysql_connection(): void
     {
         config(['database.connections.app' => $this->mysqlConnection()]);
 
@@ -35,7 +41,7 @@ class DatabaseConfigTest extends TestCase
         );
     }
 
-    public function test_a_unix_socket_replaces_host_and_port()
+    public function test_a_unix_socket_replaces_host_and_port(): void
     {
         config(['database.connections.app' => $this->mysqlConnection([
             'host' => null,
@@ -49,7 +55,7 @@ class DatabaseConfigTest extends TestCase
         $this->assertStringNotContainsString('--port', $command);
     }
 
-    public function test_it_passes_mysql_backup_options_from_the_connection()
+    public function test_it_passes_mysql_backup_options_from_the_connection(): void
     {
         config(['database.connections.app' => $this->mysqlConnection([
             'singleTransaction' => true,
@@ -68,7 +74,7 @@ class DatabaseConfigTest extends TestCase
         $this->assertStringContainsString('--skip-comments', $command);
     }
 
-    public function test_command_extra_params_apply_when_the_connection_sets_none()
+    public function test_command_extra_params_apply_when_the_connection_sets_none(): void
     {
         config(['backup-manager.command-extra-params' => '--max-allowed-packet=64M']);
         config(['database.connections.app' => $this->mysqlConnection()]);
@@ -76,14 +82,14 @@ class DatabaseConfigTest extends TestCase
         $this->assertStringContainsString('--max-allowed-packet=64M', $this->dumpCommandFor('app'));
     }
 
-    public function test_a_mariadb_connection_is_backed_up_as_mysql()
+    public function test_a_mariadb_connection_is_backed_up_as_mysql(): void
     {
         config(['database.connections.app' => $this->mysqlConnection(['driver' => 'mariadb'])]);
 
         $this->assertInstanceOf(MysqlDatabase::class, $this->app->make(DatabaseProvider::class)->get('app'));
     }
 
-    public function test_an_unsupported_driver_is_reported_as_unsupported()
+    public function test_an_unsupported_driver_is_reported_as_unsupported(): void
     {
         config(['database.connections.lite' => ['driver' => 'sqlite', 'database' => ':memory:']]);
 
@@ -92,7 +98,7 @@ class DatabaseConfigTest extends TestCase
         $this->app->make(DatabaseProvider::class)->get('lite');
     }
 
-    public function test_a_resolved_database_provider_sees_connections_set_at_runtime()
+    public function test_a_resolved_database_provider_sees_connections_set_at_runtime(): void
     {
         $databases = $this->app->make(DatabaseProvider::class);
 
@@ -101,7 +107,7 @@ class DatabaseConfigTest extends TestCase
         $this->assertStringContainsString("'tenant_42'", $databases->get('tenant')->getDumpCommandLine('out.sql'));
     }
 
-    public function test_a_read_write_connection_is_backed_up_from_the_write_host()
+    public function test_a_read_write_connection_is_backed_up_from_the_write_host(): void
     {
         config(['database.connections.app' => $this->mysqlConnection([
             'host' => null,

@@ -1,255 +1,100 @@
-<?php namespace BackupManager\Laravel;
+<?php
 
-use Illuminate\Console\Command;
-use Symfony\Component\Console\Input\InputOption;
+declare(strict_types=1);
+
+namespace BackupManager\Laravel;
+
 use BackupManager\Databases\DatabaseProvider;
-use BackupManager\Procedures\RestoreProcedure;
 use BackupManager\Filesystems\FilesystemProvider;
+use BackupManager\Procedures\RestoreProcedure;
+use Illuminate\Console\Command;
+use Symfony\Component\Console\Attribute\AsCommand;
 
-/**
- * Class DbRestoreCommand
- * @package BackupManager\Laravel
- */
-class DbRestoreCommand extends Command {
-    use AutoComplete;
+#[AsCommand(name: 'db:restore')]
+final class DbRestoreCommand extends Command
+{
     use ListsBackupFiles;
+    use PromptsForOptions;
 
-    /**
-     * The console command name.
-     *
-     * @var string
-     */
-    protected $name = 'db:restore';
+    /** @var string */
+    protected $signature = 'db:restore
+        {--source= : Storage connection name (config/backup-manager.php)}
+        {--sourcePath= : Backup file path on the storage connection}
+        {--database= : Database connection name (config/database.php)}
+        {--compression= : Compression type: gzip or null}';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
+    /** @var string */
     protected $description = 'Restore a database backup.';
 
-    /**
-     * The required arguments.
-     *
-     * @var array
-     */
-    private $required = ['source', 'sourcePath', 'database', 'compression'];
+    public function handle(RestoreProcedure $restore, FilesystemProvider $filesystems, DatabaseProvider $databases): int
+    {
+        $missing = $this->missingOptions(['source', 'sourcePath', 'database', 'compression']);
+        if ($this->refuseToPrompt($missing)) {
+            return self::FAILURE;
+        }
 
-    /**
-     * The missing arguments.
-     *
-     * @var array
-     */
-    private $missingArguments;
-
-    /**
-     * @var \BackupManager\Procedures\RestoreProcedure
-     */
-    private $restore;
-
-    /**
-     * @var \BackupManager\Filesystems\FilesystemProvider
-     */
-    private $filesystems;
-
-    /**
-     * @var \BackupManager\Databases\DatabaseProvider
-     */
-    private $databases;
-
-    /**
-     * @param \BackupManager\Procedures\RestoreProcedure $restore
-     * @param \BackupManager\Filesystems\FilesystemProvider $filesystems
-     * @param \BackupManager\Databases\DatabaseProvider $databases
-     */
-    public function __construct(RestoreProcedure $restore, FilesystemProvider $filesystems, DatabaseProvider $databases) {
-        parent::__construct();
-        $this->restore = $restore;
-        $this->filesystems = $filesystems;
-        $this->databases = $databases;
-    }
-
-    /**
-     *
-     */
-    public function fire() {
-        if ($this->isMissingArguments()) {
-            $this->displayMissingArguments();
-            $this->promptForMissingArgumentValues();
-            $this->validateArguments();
+        if ($missing !== []) {
+            $this->info('These options have not been given yet: <comment>' . implode(', ', $missing) . '</comment>');
+            do {
+                foreach ($missing as $option) {
+                    $asked = match ($option) {
+                        'source' => $this->askChoice('source', 'From which storage connection do you want to restore?', $filesystems->getAvailableProviders()),
+                        'sourcePath' => $this->askSourcePath($filesystems),
+                        'database' => $this->askChoice('database', 'To which database connection do you want to restore?', $databases->getAvailableProviders()),
+                        default => $this->askChoice('compression', 'With which compression type was the backup made?', ['gzip', 'null']),
+                    };
+                    if ($asked === false) {
+                        return self::FAILURE;
+                    }
+                }
+            } while (!$this->confirmed(sprintf(
+                'Do you want to restore the backup <comment>%s</comment> from <comment>%s</comment> to database <comment>%s</comment>, decompressing it with <comment>%s</comment>?',
+                $this->stringOption('sourcePath'),
+                $this->stringOption('source'),
+                $this->stringOption('database'),
+                $this->stringOption('compression')
+            )));
         }
 
         $this->info('Downloading and importing backup...');
-        $this->restore->run(
-            $this->option('source'),
-            $this->option('sourcePath'),
-            $this->option('database'),
-            $this->option('compression')
+        $restore->run(
+            (string) $this->stringOption('source'),
+            (string) $this->stringOption('sourcePath'),
+            (string) $this->stringOption('database'),
+            $this->stringOption('compression')
         );
 
-        $this->line('');
-        $root = $this->filesystems->getConfig($this->option('source'), 'root');
-        $this->info(sprintf('Successfully restored <comment>%s</comment> from <comment>%s</comment> to database <comment>%s</comment>.',
-            $root . $this->option('sourcePath'),
-            $this->option('source'),
-            $this->option('database')
+        $this->newLine();
+        $this->info(sprintf(
+            'Successfully restored <comment>%s</comment> from <comment>%s</comment> to database <comment>%s</comment>.',
+            $this->stringOption('sourcePath'),
+            $this->stringOption('source'),
+            $this->stringOption('database')
         ));
+
+        return self::SUCCESS;
     }
 
     /**
-     * @return bool
+     * @return bool false when the directory holds no backups
      */
-    private function isMissingArguments() {
-        foreach ($this->required as $argument) {
-            if ( ! $this->option($argument)) {
-                $this->missingArguments[] = $argument;
-            }
-        }
-        return (bool) $this->missingArguments;
-    }
+    private function askSourcePath(FilesystemProvider $filesystems): bool
+    {
+        $directory = (string) $this->ask('From which directory do you want to restore?', '');
+        $files = $this->listBackupFiles($filesystems->get((string) $this->stringOption('source')), $directory);
 
-    /**
-     * @return void
-     */
-    private function displayMissingArguments() {
-        $formatted = implode(', ', $this->missingArguments);
-        $this->info("These arguments haven't been filled yet: <comment>{$formatted}</comment>");
-        $this->info('The following questions will fill these in for you.');
-        $this->line('');
-    }
+        if ($files === []) {
+            $this->error('No backups were found in this directory.');
 
-    /**
-     * @return void
-     */
-    private function promptForMissingArgumentValues() {
-        foreach ($this->missingArguments as $argument) {
-            if ($argument == 'source') {
-                $this->askSource();
-            } elseif ($argument == 'sourcePath') {
-                $this->askSourcePath();
-            } elseif ($argument == 'database') {
-                $this->askDatabase();
-            } elseif ($argument == 'compression') {
-                $this->askCompression();
-            }
-            $this->line('');
-        }
-    }
-
-    /**
-     *
-     */
-    private function askSource() {
-        $providers = $this->filesystems->getAvailableProviders();
-        $formatted = implode(', ', $providers);
-        $this->info("Available storage services: <comment>{$formatted}</comment>");
-        $source = $this->autocomplete("From which storage service do you want to choose?", $providers);
-        $this->input->setOption('source', $source);
-    }
-
-    /**
-     *
-     */
-    private function askSourcePath() {
-        // ask path
-        $root = $this->filesystems->getConfig($this->option('source'), 'root');
-        $path = $this->ask("From which path do you want to select?<comment> {$root}</comment>");
-        $this->line('');
-
-        // ask file
-        $filesystem = $this->filesystems->get($this->option('source'));
-        $listed = $this->listBackupFiles($filesystem, $path);
-
-        if (empty($listed)) {
-            $this->info('No backups were found at this path.');
-            return;
+            return false;
         }
 
-        $files = array_column($listed, 'name');
-        $rows = $this->backupFileRows($listed);
         $this->info('Available database dumps:');
-        $this->table(['Name', 'Extension', 'Size', 'Created'], $rows);
-        $filename = $this->autocomplete("Which database dump do you want to restore?", $files);
-        $this->input->setOption('sourcePath', $this->joinPath($path, $filename));
-    }
+        $this->renderBackupFiles($files);
+        $names = array_map(static fn ($file): string => basename($file->path()), $files);
+        $filename = $this->choice('Which database dump do you want to restore?', $names);
+        $this->input->setOption('sourcePath', self::joinPath($directory, is_array($filename) ? (string) reset($filename) : $filename));
 
-    /**
-     *
-     */
-    private function askDatabase() {
-        $providers = $this->databases->getAvailableProviders();
-        $formatted = implode(', ', $providers);
-        $this->info("Available database connections: <comment>{$formatted}</comment>");
-        $database = $this->autocomplete("From which database connection you want to restore?", $providers);
-        $this->input->setOption('database', $database);
-    }
-
-    /**
-     *
-     */
-    private function askCompression() {
-        $types = ['null', 'gzip'];
-        $formatted = implode(', ', $types);
-        $this->info("Available compression types: <comment>{$formatted}</comment>");
-        $compression = $this->autocomplete('Which compression type you want to use?', $types);
-        $this->input->setOption('compression', $compression);
-    }
-
-    /**
-     * @return void
-     */
-    private function validateArguments() {
-        $root = $this->filesystems->getConfig($this->option('source'), 'root');
-        $this->info('Just to be sure...');
-        $this->info(sprintf('Do you want to restore the backup <comment>%s</comment> from <comment>%s</comment> to database <comment>%s</comment> and decompress it from <comment>%s</comment>?',
-            $root . $this->option('sourcePath'),
-            $this->option('source'),
-            $this->option('database'),
-            $this->option('compression')
-        ));
-        $this->line('');
-        $confirmation = $this->confirm('Are these correct? [Y/n]');
-        if ( ! $confirmation) {
-            $this->reaskArguments();
-        }
-    }
-
-    /**
-     * Get the console command options.
-     *
-     * @return void
-     */
-    private function reaskArguments() {
-        $this->line('');
-        $this->info('Answers have been reset and re-asking questions.');
-        $this->line('');
-        $this->promptForMissingArgumentValues();
-    }
-
-    /**
-     * Get the console command options.
-     *
-     * @return array
-     */
-    protected function getOptions() {
-        return [
-            ['source', null, InputOption::VALUE_OPTIONAL, 'Source configuration name', null],
-            ['sourcePath', null, InputOption::VALUE_OPTIONAL, 'Source path from service', null],
-            ['database', null, InputOption::VALUE_OPTIONAL, 'Database configuration name', null],
-            ['compression', null, InputOption::VALUE_OPTIONAL, 'Compression type', null],
-        ];
-    }
-
-    /**
-     * @param $bytes
-     * @param int $precision
-     * @return string
-     */
-    private function formatBytes($bytes, $precision = 2) {
-        $units = ['B', 'KB', 'MB', 'GB', 'TB'];
-        $bytes = max($bytes, 0);
-        $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
-        $pow = min($pow, count($units) - 1);
-        return round($bytes / pow(1024, $pow), $precision) . ' ' . $units[$pow];
+        return true;
     }
 }

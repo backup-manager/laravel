@@ -6,6 +6,29 @@ adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [3.0.0] - unreleased
+
+Requires PHP 8.2, Laravel 12 or 13, and backup-manager 4.1. See
+[UPGRADE.md](UPGRADE.md).
+
+### Changed
+- Requires `backup-manager/backup-manager` ^4.1 (Flysystem 3), PHP 8.2+ and
+  `illuminate/*` ^12.71.0 or ^13.40.0, the first releases patched for
+  CVE-2026-128083. Laravel 7–11 stay on 2.x.
+- `BackupManagerServiceProvider` replaces `Laravel55ServiceProvider`, and
+  `DbBackupCommand`, `DbRestoreCommand` and `DbListCommand` replace the
+  `Laravel55*` command classes; the old names remain as deprecated aliases.
+- Commands are final, receive their services in `handle()`, and fail with a
+  "Missing options" error instead of prompting in non-interactive runs.
+- `db:list` without `--path` lists the storage root.
+- Native types and `strict_types`; PHPStan level 8 and Psalm level 2 in CI.
+
+### Removed
+- `Lumen55ServiceProvider` (Lumen is discontinued).
+- The `DropboxV2` and `Rackspace` storage types, removed from core 4.0, and
+  the default `rackspace` connection.
+- The traits `AutoComplete`, `Laravel55Compatibility` and `GetDatabaseConfig`.
+
 ## [2.1.0] - 2026-11-22
 
 ### Added

@@ -1,239 +1,78 @@
-<?php namespace BackupManager\Laravel;
+<?php
 
-use BackupManager\Filesystems\Destination;
-use Illuminate\Console\Command;
-use Symfony\Component\Console\Input\InputOption;
+declare(strict_types=1);
+
+namespace BackupManager\Laravel;
+
 use BackupManager\Databases\DatabaseProvider;
-use BackupManager\Procedures\BackupProcedure;
+use BackupManager\Filesystems\Destination;
 use BackupManager\Filesystems\FilesystemProvider;
+use BackupManager\Procedures\BackupProcedure;
+use Illuminate\Console\Command;
+use Symfony\Component\Console\Attribute\AsCommand;
 
-/**
- * Class ManagerBackupCommand
- * @package BackupManager\Laravel
- */
-class DbBackupCommand extends Command {
-    use AutoComplete;
+#[AsCommand(name: 'db:backup')]
+final class DbBackupCommand extends Command
+{
+    use PromptsForOptions;
 
-    /**
-     * The console command name.
-     *
-     * @var string
-     */
-    protected $name = 'db:backup';
+    /** @var string */
+    protected $signature = 'db:backup
+        {--database= : Database connection name (config/database.php)}
+        {--destination= : Storage connection name (config/backup-manager.php)}
+        {--destinationPath= : File path on the storage connection}
+        {--compression= : Compression type: gzip or null}
+        {--timestamp= : Date format appended to the file path, e.g. Y-m-d_H-i-s}';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
+    /** @var string */
     protected $description = 'Create database dump and save it on a service';
 
-    /**
-     * The required arguments.
-     *
-     * @var array
-     */
-    private $required = ['database', 'destination', 'destinationPath', 'compression'];
-
-    /**
-     * Optional timestamp.
-     *
-     * @var string
-     */
-    private $timestamp;
-
-    /**
-     * The missing arguments.
-     *
-     * @var array
-     */
-    private $missingArguments;
-
-    /**
-     * @var \BackupManager\Procedures\BackupProcedure
-     */
-    private $backupProcedure;
-
-    /**
-     * @var \BackupManager\Databases\DatabaseProvider
-     */
-    private $databases;
-
-    /**
-     * @var \BackupManager\Filesystems\FilesystemProvider
-     */
-    private $filesystems;
-
-    /**
-     * @param BackupProcedure $backupProcedure
-     * @param DatabaseProvider $databases
-     * @param FilesystemProvider $filesystems
-     */
-    public function __construct(BackupProcedure $backupProcedure, DatabaseProvider $databases, FilesystemProvider $filesystems) {
-        $this->backupProcedure = $backupProcedure;
-        $this->databases = $databases;
-        $this->filesystems = $filesystems;
-
-        parent::__construct();
-    }
-
-    /**
-     * Execute the console command.
-     *
-     * @throws \BackupManager\Filesystems\FilesystemTypeNotSupported
-     * @throws \BackupManager\Compressors\CompressorTypeNotSupported
-     * @throws \BackupManager\Databases\DatabaseTypeNotSupported
-     * @throws \BackupManager\Config\ConfigNotFoundForConnection
-     * @return mixed
-     */
-    public function fire() {
-        $this->timestamp = date((string) $this->option('timestamp'));
-
-        if ($this->isMissingArguments()) {
-            $this->displayMissingArguments();
-            $this->promptForMissingArgumentValues();
-            $this->validateArguments();
+    public function handle(BackupProcedure $backup, DatabaseProvider $databases, FilesystemProvider $filesystems): int
+    {
+        $missing = $this->missingOptions(['database', 'destination', 'destinationPath', 'compression']);
+        if ($this->refuseToPrompt($missing)) {
+            return self::FAILURE;
         }
 
-        $destinations = [
-            new Destination(
-                $this->option('destination'),
-                $this->option('destinationPath') . $this->timestamp
-            )
-        ];
+        if ($missing !== []) {
+            $this->info('These options have not been given yet: <comment>' . implode(', ', $missing) . '</comment>');
+            do {
+                foreach ($missing as $option) {
+                    match ($option) {
+                        'database' => $this->askChoice('database', 'From which database connection do you want to dump?', $databases->getAvailableProviders()),
+                        'destination' => $this->askChoice('destination', 'To which storage connection do you want to save?', $filesystems->getAvailableProviders()),
+                        'destinationPath' => $this->askText('destinationPath', 'How do you want to name the backup?'),
+                        default => $this->askChoice('compression', 'Which compression type do you want to use?', ['gzip', 'null']),
+                    };
+                }
+            } while (!$this->confirmed(sprintf(
+                'Do you want to create a backup of <comment>%s</comment>, store it on <comment>%s</comment> at <comment>%s</comment> and compress it with <comment>%s</comment>?',
+                $this->stringOption('database'),
+                $this->stringOption('destination'),
+                $this->destinationPath(),
+                $this->stringOption('compression')
+            )));
+        }
+
+        $destination = new Destination((string) $this->stringOption('destination'), $this->destinationPath());
 
         $this->info('Dumping database and uploading...');
-        $this->backupProcedure->run(
-            $this->option('database'),
-            $destinations,
-            $this->option('compression')
-        );
+        $backup->run((string) $this->stringOption('database'), [$destination], $this->stringOption('compression'));
 
-        $this->line('');
-        $root = $this->filesystems->getConfig($this->option('destination'), 'root');
-        $this->info(sprintf('Successfully dumped <comment>%s</comment>, compressed with <comment>%s</comment> and store it to <comment>%s</comment> at <comment>%s</comment>',
-            $this->option('database'),
-            $this->option('compression'),
-            $this->option('destination'),
-            $destinations[0]->destinationPath()
+        $this->newLine();
+        $this->info(sprintf(
+            'Successfully dumped <comment>%s</comment>, compressed with <comment>%s</comment> and stored it on <comment>%s</comment> at <comment>%s</comment>',
+            $this->stringOption('database'),
+            $this->stringOption('compression'),
+            $destination->destinationFilesystem(),
+            $destination->destinationPath()
         ));
+
+        return self::SUCCESS;
     }
 
-    /**
-     * @return bool
-     */
-    private function isMissingArguments() {
-        foreach ($this->required as $argument) {
-            if ( ! $this->option($argument)) {
-                $this->missingArguments[] = $argument;
-            }
-        }
-        return isset($this->missingArguments);
-    }
-
-    /**
-     * @return void
-     */
-    private function displayMissingArguments() {
-        $formatted = implode(', ', $this->missingArguments);
-        $this->info("These arguments haven't been filled yet: <comment>{$formatted}</comment>");
-        $this->info('The following questions will fill these in for you.');
-        $this->line('');
-    }
-
-    /**
-     * @return void
-     */
-    private function promptForMissingArgumentValues() {
-        foreach ($this->missingArguments as $argument) {
-            if ($argument == 'database') {
-                $this->askDatabase();
-            } elseif ($argument == 'destination') {
-                $this->askDestination();
-            } elseif ($argument == 'destinationPath') {
-                $this->askDestinationPath();
-            } elseif ($argument == 'compression') {
-                $this->askCompression();
-            }
-            $this->line('');
-        }
-    }
-
-    private function askDatabase() {
-        $providers = $this->databases->getAvailableProviders();
-        $formatted = implode(', ', $providers);
-        $this->info("Available database connections: <comment>{$formatted}</comment>");
-        $database = $this->autocomplete("From which database connection you want to dump?", $providers);
-        $this->input->setOption('database', $database);
-    }
-
-    private function askDestination() {
-        $providers = $this->filesystems->getAvailableProviders();
-        $formatted = implode(', ', $providers);
-        $this->info("Available storage services: <comment>{$formatted}</comment>");
-        $destination = $this->autocomplete("To which storage service you want to save?", $providers);
-        $this->input->setOption('destination', $destination);
-    }
-
-    private function askDestinationPath() {
-        $root = $this->filesystems->getConfig($this->option('destination'), 'root');
-        $path = $this->ask("How do you want to name the backup?<comment> {$root}</comment>");
-        $this->input->setOption('destinationPath', $path);
-    }
-
-    private function askCompression() {
-        $types = ['null', 'gzip'];
-        $formatted = implode(', ', $types);
-        $this->info("Available compression types: <comment>{$formatted}</comment>");
-        $compression = $this->autocomplete('Which compression type you want to use?', $types);
-        $this->input->setOption('compression', $compression);
-    }
-
-    /**
-     * @throws \BackupManager\Config\ConfigFieldNotFound
-     * @throws \BackupManager\Config\ConfigNotFoundForConnection
-     * @return void
-     */
-    private function validateArguments() {
-        $root = $this->filesystems->getConfig($this->option('destination'), 'root');
-        $this->info('Just to be sure...');
-        $this->info(sprintf('Do you want to create a backup of <comment>%s</comment>, store it on <comment>%s</comment> at <comment>%s</comment> and compress it to <comment>%s</comment>?',
-            $this->option('database'),
-            $this->option('destination'),
-            $root . $this->option('destinationPath') . $this->timestamp,
-            $this->option('compression')
-        ));
-        $this->line('');
-        $confirmation = $this->confirm('Are these correct? [Y/n]');
-        if ( ! $confirmation) {
-            $this->reaskArguments();
-        }
-    }
-
-    /**
-     * Get the console command options.
-     *
-     * @return void
-     */
-    private function reaskArguments() {
-        $this->line('');
-        $this->info('Answers have been reset and re-asking questions.');
-        $this->line('');
-        $this->promptForMissingArgumentValues();
-    }
-
-    /**
-     * Get the console command options.
-     *
-     * @return array
-     */
-    protected function getOptions() {
-        return [
-            ['database', null, InputOption::VALUE_OPTIONAL, 'Database configuration name', null],
-            ['destination', null, InputOption::VALUE_OPTIONAL, 'Destination configuration name', null],
-            ['destinationPath', null, InputOption::VALUE_OPTIONAL, 'File destination path', null],
-            ['compression', null, InputOption::VALUE_OPTIONAL, 'Compression type', null],
-            ['timestamp', null, InputOption::VALUE_OPTIONAL, 'Append timestamp to filename', null],
-        ];
+    private function destinationPath(): string
+    {
+        return $this->stringOption('destinationPath') . date((string) $this->stringOption('timestamp'));
     }
 }
